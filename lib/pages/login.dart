@@ -1,18 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:flutter_network/Widget/bezierContainer.dart';
 import 'package:flutter_network/pages/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ars_progress_dialog/ars_progress_dialog.dart';
+import 'package:http/http.dart' as http;
+import 'package:rich_alert/rich_alert.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
 
+  var username, password;
   final String title;
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  ArsProgressDialog progressDialog;
   Widget _entryField(String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -27,6 +34,14 @@ class _LoginPageState extends State<LoginPage> {
             height: 10,
           ),
           TextField(
+            onChanged: (value){
+              setState(() {
+                if (isPassword)
+                widget.password = value.trim();
+                else
+                widget.username = value.trim();
+              });
+            },
               obscureText: isPassword,
               decoration: InputDecoration(
                   border: InputBorder.none,
@@ -37,10 +52,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _submitButton() {
-    return GestureDetector(
-      onTap: (){
-        Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
+  Widget  _submitButton(BuildContext context) {
+    return GestureDetector (
+      onTap: () async{
+        progressDialog.show();
+        http.Response response = await login(widget.username, widget.password);
+        progressDialog.dismiss();
+        if (response.statusCode == 200) {
+          print(response.body);
+        } else {
+          DangerAlertBox(context: context, messageText: "Something went wrong. Please try again..",title: "Error");
+        }
+        // Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -65,6 +88,19 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<http.Response>  login(username, password) async{
+    var url = 'https://sfcfiber.co.ke/v1/api/login';
+    print("Login with $username and $password");
+   return http.post(url,  body: {'username': "$username", 'pass': "$password"}).timeout(
+            Duration(seconds: 30),
+            onTimeout: () {
+              progressDialog.dismiss();
+              DangerAlertBox(context: context, messageText: "Action took so long. Please check your internet connection and try again.",title: "Error");
+              return null;
+            }
+        );
   }
 
   Widget _title() {
@@ -98,6 +134,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    progressDialog = ArsProgressDialog(context,
+        blur: 2,
+        backgroundColor: Color(0x33000000),
+        animationDuration: Duration(milliseconds: 500));
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Container(
@@ -120,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 50),
                   _emailPasswordWidget(),
                   SizedBox(height: 20),
-                  _submitButton(),
+                  _submitButton(context),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.centerRight,

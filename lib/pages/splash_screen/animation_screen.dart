@@ -75,7 +75,7 @@ class _AnimationScreenState extends State<AnimationScreen> with SingleTickerProv
             child: Opacity(
               opacity: _animation.textOpacity.value,
               child: Text(
-                'Raindrop Software',
+                'SFCFIBRE',
                 style: TextStyle(
                     color: Colors.white, fontSize: 32
                 ),
