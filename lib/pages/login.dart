@@ -1,18 +1,21 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:flutter_network/Widget/bezierContainer.dart';
 import 'package:flutter_network/pages/home_page.dart';
+import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ars_progress_dialog/ars_progress_dialog.dart';
 import 'package:http/http.dart' as http;
-import 'package:rich_alert/rich_alert.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
 
-  var username, password;
+  TextEditingController usernameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
+
   final String title;
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -34,14 +37,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 10,
           ),
           TextField(
-            onChanged: (value){
-              setState(() {
-                if (isPassword)
-                widget.password = value.trim();
-                else
-                widget.username = value.trim();
-              });
-            },
+            controller: isPassword ? widget.passwordController : widget.usernameController,
               obscureText: isPassword,
               decoration: InputDecoration(
                   border: InputBorder.none,
@@ -56,14 +52,30 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector (
       onTap: () async{
         progressDialog.show();
-        http.Response response = await login(widget.username, widget.password);
+        print(widget.usernameController.text);
+        http.Response response = await login(widget.usernameController.text, widget.passwordController.text);
         progressDialog.dismiss();
         if (response.statusCode == 200) {
-          print(response.body);
+          SessionManager prefs = SessionManager();
+          final decoded = jsonDecode(response.body) as Map;
+          var firstName = decoded['first_name'];
+          var lastName = decoded['last_name'];
+          var email = decoded['email'];
+          var phone = decoded['phone'];
+          var username = decoded['username'];
+
+          prefs.setFirstName(firstName);
+          prefs.setLastName(lastName);
+          prefs.setEmail(email);
+          prefs.setPhone(phone);
+          prefs.setUsername(username);
+
+          Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
+
         } else {
           DangerAlertBox(context: context, messageText: "Something went wrong. Please try again..",title: "Error");
         }
-        // Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
+        //
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

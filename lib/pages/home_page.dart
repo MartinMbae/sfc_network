@@ -3,6 +3,7 @@ import 'package:flutter_network/fragments/second_fragment.dart';
 import 'package:flutter_network/fragments/third_fragment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_network/pages/login.dart';
+import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DrawerItem {
@@ -84,6 +85,16 @@ class HomePageState extends State<HomePage> {
       );
     }
     GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
+
+    SessionManager prefs = SessionManager();
+    var firstName = prefs.getFirstName();
+    var lastName = prefs.getLastName();
+    var username = prefs.getUsername();
+    var email = prefs.getEmail();
+    var phone = prefs.getPhone();
+
+
+
     return  Scaffold(
       primary: true,
       appBar:  AppBar(
@@ -107,8 +118,8 @@ class HomePageState extends State<HomePage> {
               child: Column(
                 children: <Widget>[
                    UserAccountsDrawerHeader(
-                      accountName:  Text("John Doe"),
-                      accountEmail: Text("0712345678"),
+                      accountName:  Text("$firstName $lastName ($username"),
+                      accountEmail: Text("$email"),
                     currentAccountPicture: Image.asset('assets/net1.png'),
                   ),
                    Column(children: drawerOptions)
