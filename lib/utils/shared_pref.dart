@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionManager {
+  final String id = "id";
   final String firstName = "first_name";
   final String lastName = "last_name";
   final String email = "email";
@@ -53,6 +54,16 @@ class SessionManager {
   Future<String> getPhone() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getString(this.phone) ?? null;
+  }
+
+
+  Future<void> setId(int id) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(this.id, id);
+  }
+  Future<int> getId() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getInt(this.id) ?? null;
   }
 
 

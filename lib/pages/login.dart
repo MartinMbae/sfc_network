@@ -52,23 +52,30 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector (
       onTap: () async{
         progressDialog.show();
+        print("dddddddddddddddd");
         print(widget.usernameController.text);
+        print("dddddddddddddddd");
         http.Response response = await login(widget.usernameController.text, widget.passwordController.text);
         progressDialog.dismiss();
+        print("Response code is 200 ${response.body}");
         if (response.statusCode == 200) {
+          print("Response code is 200");
           SessionManager prefs = SessionManager();
           final decoded = jsonDecode(response.body) as Map;
           var firstName = decoded['first_name'];
+          var id = decoded['id'];
           var lastName = decoded['last_name'];
           var email = decoded['email'];
           var phone = decoded['phone'];
-          var username = decoded['username'];
+          var username = widget.usernameController.text;
 
-          prefs.setFirstName(firstName);
-          prefs.setLastName(lastName);
-          prefs.setEmail(email);
-          prefs.setPhone(phone);
-          prefs.setUsername(username);
+          await prefs.setFirstName(firstName);
+          await prefs.setLastName(lastName);
+          await prefs.setEmail(email);
+          await  prefs.setPhone(phone);
+         await prefs.setUsername(username);
+          await prefs.setId(int.parse(id));
+          print("Store $email");
 
           Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
 

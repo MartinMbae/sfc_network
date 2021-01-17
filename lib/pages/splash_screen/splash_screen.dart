@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       } else if(snapshot.hasError) {
                         return LoginPage();
                       } else {
-                        return CircularProgressIndicator();
+                        return Center(child: CircularProgressIndicator());
                       }
                     },
         )
