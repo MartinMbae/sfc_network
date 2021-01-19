@@ -44,7 +44,7 @@ class _ReportIncidentState extends State<ReportIncident> {
                     attribute: 'code',
                     decoration: InputDecoration(
                       labelText:
-                      'Incident code',
+                      'Incident Number/CRQ',
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -64,6 +64,24 @@ class _ReportIncidentState extends State<ReportIncident> {
                           value: 'Test 3', child: Text('Another type')),
                       FormBuilderFieldOption(
                           value: 'Test 4', child: Text('Another type')),
+                    ],
+                  ),
+                  FormBuilderChoiceChip(
+                    attribute: 'choice_chip',
+                    decoration: InputDecoration(
+                      labelText: 'Select Region',
+                    ),
+                    options: [
+                      FormBuilderFieldOption(
+                          value: 'Test', child: Text('Mt Kenya')),
+                      FormBuilderFieldOption(
+                          value: 'Test 1', child: Text('Nairobi')),
+                      FormBuilderFieldOption(
+                          value: 'Test 2', child: Text('Western')),
+                      FormBuilderFieldOption(
+                          value: 'Test 3', child: Text('Coastal regions')),
+                      FormBuilderFieldOption(
+                          value: 'Test 4', child: Text('RiftValley')),
                     ],
                   ),
                   _image == null

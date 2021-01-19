@@ -32,6 +32,7 @@ dependencies:
   shared_preferences: ^0.5.12+4
   flutter_form_builder: any
   image_picker: ^0.6.7+21
+  google_maps_flutter: ^1.1.1
 
 dev_dependencies:
   flutter_test:

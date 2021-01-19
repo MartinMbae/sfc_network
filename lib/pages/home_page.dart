@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
+import 'package:flutter_network/fragments/map_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
 import 'package:flutter_network/fragments/update_password.dart';
@@ -19,18 +20,15 @@ class DrawerItem {
 class HomePage extends StatefulWidget {
   final drawerItems = [
     DrawerItem(title: "Dashboard", icon: Icons.dashboard, tag: DASHBOARD),
-    DrawerItem(title: "Map", icon: Icons.map),
+    DrawerItem(title: "Map", icon: Icons.map, tag: MAP_FRAGMENT),
     DrawerItem(title: "Incident", icon: Icons.dangerous, tag: INCIDENTS),
     DrawerItem(title: "Profile", icon: Icons.person, tag: VIEW_PROFILE),
     DrawerItem(title: "Clusters", icon: Icons.group_work),
     DrawerItem(title: "Routes", icon: Icons.router_outlined),
     DrawerItem(title: "Junctions", icon: Icons.link),
     DrawerItem(title: "Customers", icon: Icons.people_alt_outlined),
-    DrawerItem(title: "Patrolling", icon: Icons.policy_sharp),
-    DrawerItem(title: "Network Design", icon: Icons.network_check),
     DrawerItem(title: "Settings", icon: Icons.settings),
     DrawerItem(title: "About the App", icon: Icons.info),
-    DrawerItem(title: "Profile", icon: Icons.person),
     DrawerItem(title: "Log out", icon: Icons.logout, tag: LOGOUT),
   ];
 
@@ -56,6 +54,8 @@ class HomePageState extends State<HomePage> {
         return ProfilePage(loggedInUser: loggedInUser,);
       case INCIDENTS:
         return ReportIncident();
+      case MAP_FRAGMENT:
+        return MapFragment();
       default:
         return Text("Error");
     }
@@ -115,61 +115,75 @@ class HomePageState extends State<HomePage> {
       return loggedInUser;
     }
 
-    return Scaffold(
-      primary: true,
-      appBar: AppBar(
-        title: Text(widget.drawerItems[selectedDrawerIndex].title),
-        leading: IconButton(
-            icon: Icon(Icons.dehaze),
-            onPressed: () {
-              if (_scaffoldKey.currentState.isDrawerOpen == false) {
-                _scaffoldKey.currentState.openDrawer();
-              } else {
-                _scaffoldKey.currentState.openEndDrawer();
-              }
-            }),
-      ),
-      body: Scaffold(
-        key: _scaffoldKey,
-        drawer: Container(
-          width: 240.w,
-          child: Drawer(
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  FutureBuilder(
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        User loggedInUser = snapshot.data;
-                        return UserAccountsDrawerHeader(
-                          accountName: Text(
-                              "${loggedInUser.firstName} ${loggedInUser.lastName}"),
-                          accountEmail: Text("${loggedInUser.email}"),
-                          currentAccountPicture: Image.asset('assets/net1.png'),
-                        );
-                      } else if (snapshot.hasError) {
-                        return UserAccountsDrawerHeader(
-                          accountName: Text("Error fetching..."),
-                          accountEmail: Text("Error fetching"),
-                          currentAccountPicture: Image.asset('assets/net1.png'),
-                        );
-                      } else {
-                        return UserAccountsDrawerHeader(
-                          accountName: CircularProgressIndicator(),
-                          accountEmail: CircularProgressIndicator(),
-                          currentAccountPicture: Image.asset('assets/net1.png'),
-                        );
-                      }
-                    },
-                    future: getUserDetails(),
-                  ),
-                  Column(children: drawerOptions)
-                ],
+    return WillPopScope(
+      onWillPop: () async {
+       if (selectedDrawerTag == DASHBOARD)
+        return true;
+       else {
+         setState(() {
+           selectedDrawerTag = DASHBOARD ;
+           selectedDrawerIndex = 0;
+         });
+         return false;
+       }
+      },
+
+      child: Scaffold(
+        primary: true,
+        appBar: AppBar(
+          title: Text(widget.drawerItems[selectedDrawerIndex].title),
+          leading: IconButton(
+              icon: Icon(Icons.dehaze),
+              onPressed: () {
+                if (_scaffoldKey.currentState.isDrawerOpen == false) {
+                  _scaffoldKey.currentState.openDrawer();
+                } else {
+                  _scaffoldKey.currentState.openEndDrawer();
+                }
+              }),
+        ),
+        body: Scaffold(
+          key: _scaffoldKey,
+          drawer: Container(
+            width: 240.w,
+            child: Drawer(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    FutureBuilder(
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          User loggedInUser = snapshot.data;
+                          return UserAccountsDrawerHeader(
+                            accountName: Text(
+                                "${loggedInUser.firstName} ${loggedInUser.lastName}"),
+                            accountEmail: Text("${loggedInUser.email}"),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        } else if (snapshot.hasError) {
+                          return UserAccountsDrawerHeader(
+                            accountName: Text("Error fetching..."),
+                            accountEmail: Text("Error fetching"),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        } else {
+                          return UserAccountsDrawerHeader(
+                            accountName: CircularProgressIndicator(),
+                            accountEmail: CircularProgressIndicator(),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        }
+                      },
+                      future: getUserDetails(),
+                    ),
+                    Column(children: drawerOptions)
+                  ],
+                ),
               ),
             ),
           ),
+          body:   _getDrawerItemWidget(selectedDrawerTag),
         ),
-        body:   _getDrawerItemWidget(selectedDrawerTag),
       ),
     );
   }
