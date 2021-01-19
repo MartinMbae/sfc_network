@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:ars_progress_dialog/ars_progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:flutter_network/Widget/bezierContainer.dart';
 import 'package:flutter_network/pages/home_page.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ars_progress_dialog/ars_progress_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
@@ -59,7 +58,6 @@ class _LoginPageState extends State<LoginPage> {
           return;
         }
         progressDialog.show();
-        print(widget.usernameController.text);
         http.Response response = await login(username,password);
         progressDialog.dismiss();
         if (response.statusCode == 200) {
@@ -67,8 +65,6 @@ class _LoginPageState extends State<LoginPage> {
           final decoded = jsonDecode(response.body) as Map;
           //{"status":false,"message":"Username and password failed to match"}
           //{"success":true,"message":"Login successful","id":"1","first_name":"System","last_name":"Admin","email":"glob.admin","phone":"0987654567","created_at":"2019-03-01 09:31:01"}
-
-
           if (decoded.containsKey("status")){
             var status = decoded['status'];
             if (!status){
@@ -90,7 +86,15 @@ class _LoginPageState extends State<LoginPage> {
           await prefs.setUsername(username);
           await prefs.setId(int.parse(id));
 
-          Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
+          // Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+          // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()));
+          // Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
+
+          Navigator.pushAndRemoveUntil<dynamic>(context, MaterialPageRoute<dynamic>(
+              builder: (BuildContext context) => HomePage(),
+            ),
+                (route) => false,//if you want to disable back feature set to false
+          );
 
         } else {
           DangerAlertBox(context: context, messageText: "Something went wrong. Please try again..",title: "Error");
@@ -124,7 +128,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<http.Response>  login(username, password) async{
     var url = 'https://sfcfiber.co.ke/v1/api/login';
-    print("Login with $username and $password");
    return http.post(url,  body: {'username': "$username", 'pass': "$password"}).timeout(
             Duration(seconds: 30),
             onTimeout: () {

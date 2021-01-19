@@ -66,5 +66,9 @@ class SessionManager {
     return pref.getInt(this.id) ?? null;
   }
 
+  Future<void> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+  }
 
 }
