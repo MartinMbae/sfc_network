@@ -30,6 +30,8 @@ dependencies:
   ars_progress_dialog: ^0.1.2
   flutter_awesome_alert_box: ^1.0.1
   shared_preferences: ^0.5.12+4
+  flutter_form_builder: any
+  image_picker: ^0.6.7+21
 
 dev_dependencies:
   flutter_test:

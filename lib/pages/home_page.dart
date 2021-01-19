@@ -1,7 +1,9 @@
 import 'package:flutter_network/fragments/first_fragment.dart';
+import 'package:flutter_network/fragments/report_incident.dart';
 import 'package:flutter_network/fragments/second_fragment.dart';
-import 'package:flutter_network/fragments/third_fragment.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_network/fragments/update_password.dart';
+import 'package:flutter_network/models/user.dart';
 import 'package:flutter_network/pages/login.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,11 +18,11 @@ class HomePage extends StatefulWidget {
   final drawerItems = [
      DrawerItem("Dashboard", Icons.dashboard),
      DrawerItem("Map", Icons.local_pizza),
+    DrawerItem("Incident", Icons.dangerous),
      DrawerItem("Clusters", Icons.group_work),
      DrawerItem("Routes", Icons.router_outlined),
      DrawerItem("Junctions", Icons.link),
      DrawerItem("Customers", Icons.people_alt_outlined),
-     DrawerItem("Incident", Icons.dangerous),
      DrawerItem("Patrolling", Icons.policy_sharp),
      DrawerItem("Network Design", Icons.network_check),
      DrawerItem("Settings", Icons.settings),
@@ -45,10 +47,12 @@ class HomePageState extends State<HomePage> {
       case 1:
         return  SecondFragment();
       case 2:
-        return  ThirdFragment();
-
+        return  UpdatePassword();
+      case 3:
+        return  ReportIncident();
+      case 4:
+        return  UpdatePassword();
       default:
-
         return  Text("Error");
     }
   }
@@ -62,8 +66,6 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     final screenHeight = MediaQuery.of(context).size.height;
-
-
     List<Widget> drawerOptions = [];
     for (var i = 0; i < widget.drawerItems.length; i++) {
       var d = widget.drawerItems[i];
@@ -86,14 +88,19 @@ class HomePageState extends State<HomePage> {
     }
     GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
 
-    SessionManager prefs = SessionManager();
-    var firstName = prefs.getFirstName();
-    var lastName = prefs.getLastName();
-    var username = prefs.getUsername();
-    var email = prefs.getEmail();
-    var phone = prefs.getPhone();
+    Future<User> getUserDetails() async{
+      await Future.delayed(Duration(seconds: 3));
+      SessionManager prefs = SessionManager();
+      String firstName = await prefs.getFirstName();
+      String lastName = await prefs.getLastName();
+      String username = await prefs.getUsername();
+      String email = await prefs.getEmail();
+      String phone = await prefs.getPhone();
+      int id = await prefs.getId();
 
-
+      User loggedInUser = User(id: id, firstName: firstName, lastName: lastName, username: username, email: email, phone: phone );
+      return loggedInUser;
+    }
 
     return  Scaffold(
       primary: true,
@@ -117,10 +124,34 @@ class HomePageState extends State<HomePage> {
             child:  SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                   UserAccountsDrawerHeader(
-                      accountName:  Text("$firstName $lastName ($username"),
-                      accountEmail: Text("$email"),
-                    currentAccountPicture: Image.asset('assets/net1.png'),
+                  FutureBuilder(
+                      builder: (context, snapshot){
+                        if (snapshot.hasData){
+                          User loggedInUser = snapshot.data;
+
+                          print(loggedInUser.username);
+
+                          return UserAccountsDrawerHeader(
+                            accountName:  Text("${loggedInUser.firstName} ${loggedInUser.lastName}"),
+                            accountEmail: Text("${loggedInUser.email}"),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        }else if (snapshot.hasError){
+                          return UserAccountsDrawerHeader(
+                            accountName:  Text("Error fetching..."),
+                            accountEmail: Text("Error fetching"),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        }else{
+                          return UserAccountsDrawerHeader(
+                            accountName:  CircularProgressIndicator(),
+                            accountEmail: CircularProgressIndicator(),
+                            currentAccountPicture: Image.asset('assets/net1.png'),
+                          );
+                        }
+
+                  },
+                  future: getUserDetails(),
                   ),
                    Column(children: drawerOptions)
                 ],

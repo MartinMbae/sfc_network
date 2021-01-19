@@ -51,31 +51,51 @@ class _LoginPageState extends State<LoginPage> {
   Widget  _submitButton(BuildContext context) {
     return GestureDetector (
       onTap: () async{
+
+        String username = widget.usernameController.text.trim();
+        String password = widget.passwordController.text.trim();
+        if(username.isEmpty || password.isEmpty){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all the fields")));
+          return;
+        }
         progressDialog.show();
         print(widget.usernameController.text);
-        http.Response response = await login(widget.usernameController.text, widget.passwordController.text);
+        http.Response response = await login(username,password);
         progressDialog.dismiss();
         if (response.statusCode == 200) {
           SessionManager prefs = SessionManager();
           final decoded = jsonDecode(response.body) as Map;
+          //{"status":false,"message":"Username and password failed to match"}
+          //{"success":true,"message":"Login successful","id":"1","first_name":"System","last_name":"Admin","email":"glob.admin","phone":"0987654567","created_at":"2019-03-01 09:31:01"}
+
+
+          if (decoded.containsKey("status")){
+            var status = decoded['status'];
+            if (!status){
+              DangerAlertBox(context: context, messageText: decoded['message'],title: "Failed");
+              return;
+            }
+          }
+
           var firstName = decoded['first_name'];
+          var id = decoded['id'];
           var lastName = decoded['last_name'];
           var email = decoded['email'];
           var phone = decoded['phone'];
-          var username = decoded['username'];
 
-          prefs.setFirstName(firstName);
-          prefs.setLastName(lastName);
-          prefs.setEmail(email);
-          prefs.setPhone(phone);
-          prefs.setUsername(username);
+          await prefs.setFirstName(firstName);
+          await prefs.setLastName(lastName);
+          await prefs.setEmail(email);
+          await  prefs.setPhone(phone);
+          await prefs.setUsername(username);
+          await prefs.setId(int.parse(id));
 
           Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
 
         } else {
           DangerAlertBox(context: context, messageText: "Something went wrong. Please try again..",title: "Error");
         }
-        //
+
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
