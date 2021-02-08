@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Network Manager',
         theme: ThemeData(
-          primarySwatch: Colors.red,
+          primarySwatch: Colors.deepPurple,
           // visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home:  SplashScreen(),

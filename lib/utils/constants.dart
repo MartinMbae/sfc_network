@@ -1,7 +1,5 @@
 
-const String DASHBOARD = "dashboard";
-const String INCIDENTS = "incidents";
-const String LOGOUT = "logout";
-const String UPDATE_PROFILE = "update_profile";
-const String VIEW_PROFILE = "view_profile";
-const String MAP_FRAGMENT = "map";
+const BASE_URL = "https://sfcfiber.co.ke/";
+enum FragmentMenu{
+  DASHBOARD,INCIDENTS,LOGOUT,UPDATE_PROFILE,VIEW_PROFILE,MAP_FRAGMENT,JUNCTIONS, ERROR
+}

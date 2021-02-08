@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
+import 'package:flutter_network/fragments/junctions_fragment.dart';
 import 'package:flutter_network/fragments/map_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
@@ -13,23 +14,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class DrawerItem {
   String title;
   IconData icon;
-  String tag;
-  DrawerItem({this.title, this.tag, this.icon});
+  FragmentMenu fragmentMenu;
+  DrawerItem({@required this.title,@required  this.fragmentMenu, @required this.icon});
 }
 
 class HomePage extends StatefulWidget {
   final drawerItems = [
-    DrawerItem(title: "Dashboard", icon: Icons.dashboard, tag: DASHBOARD),
-    DrawerItem(title: "Map", icon: Icons.map, tag: MAP_FRAGMENT),
-    DrawerItem(title: "Incident", icon: Icons.dangerous, tag: INCIDENTS),
-    DrawerItem(title: "Profile", icon: Icons.person, tag: VIEW_PROFILE),
-    DrawerItem(title: "Clusters", icon: Icons.group_work),
-    DrawerItem(title: "Routes", icon: Icons.router_outlined),
-    DrawerItem(title: "Junctions", icon: Icons.link),
-    DrawerItem(title: "Customers", icon: Icons.people_alt_outlined),
-    DrawerItem(title: "Settings", icon: Icons.settings),
-    DrawerItem(title: "About the App", icon: Icons.info),
-    DrawerItem(title: "Log out", icon: Icons.logout, tag: LOGOUT),
+    DrawerItem(title: "Dashboard", icon: Icons.dashboard, fragmentMenu: FragmentMenu.DASHBOARD),
+    DrawerItem(title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
+    DrawerItem(title: "Incident", icon: Icons.dangerous, fragmentMenu: FragmentMenu.INCIDENTS),
+    DrawerItem(title: "Profile", icon: Icons.person, fragmentMenu: FragmentMenu.VIEW_PROFILE),
+    DrawerItem(title: "Clusters", icon: Icons.group_work, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Routes", icon: Icons.router_outlined, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Junctions", icon: Icons.link, fragmentMenu: FragmentMenu.JUNCTIONS),
+    DrawerItem(title: "Customers", icon: Icons.people_alt_outlined, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Settings", icon: Icons.settings, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "About the App", icon: Icons.info, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Log out", icon: Icons.logout, fragmentMenu: FragmentMenu.LOGOUT),
   ];
 
   @override
@@ -39,25 +40,31 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  String selectedDrawerTag = DASHBOARD;
+  FragmentMenu selectedDrawer = FragmentMenu.DASHBOARD;
   int selectedDrawerIndex = 0;
 
   User loggedInUser;
 
-  _getDrawerItemWidget(String drawer_tag) {
-    switch (drawer_tag) {
-      case DASHBOARD:
+  _getDrawerItemWidget(FragmentMenu fragmentMenu) {
+    switch (fragmentMenu) {
+      case FragmentMenu.DASHBOARD:
         return FirstFragment();
-      case UPDATE_PROFILE:
+      case FragmentMenu.UPDATE_PROFILE:
         return UpdatePassword();
-      case VIEW_PROFILE:
+      case FragmentMenu.VIEW_PROFILE:
         return ProfilePage(loggedInUser: loggedInUser,);
-      case INCIDENTS:
+      case FragmentMenu.INCIDENTS:
         return ReportIncident();
-      case MAP_FRAGMENT:
+      case FragmentMenu.MAP_FRAGMENT:
         return MapFragment();
-      default:
-        return Text("Error");
+      case FragmentMenu.LOGOUT:
+        break;
+      case FragmentMenu.ERROR:
+        return Text("Not Implemmented");
+        break;
+      case FragmentMenu.JUNCTIONS:
+        return JunctionsPage();
+        break;
     }
   }
 
@@ -72,9 +79,9 @@ class HomePageState extends State<HomePage> {
           ListTile(
             leading: Icon(d.icon),
             title: Text(d.title),
-            selected: d.tag == selectedDrawerTag,
+            selected: d.fragmentMenu == selectedDrawer,
             onTap: () async{
-              if (d.tag == LOGOUT){
+              if (d.fragmentMenu == FragmentMenu.LOGOUT){
                 SessionManager prefs = SessionManager();
                 await prefs.logout();
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
@@ -82,7 +89,7 @@ class HomePageState extends State<HomePage> {
               }
 
               setState(() {
-                selectedDrawerTag = d.tag;
+                selectedDrawer = d.fragmentMenu;
                 selectedDrawerIndex = i;
               });
               Navigator.of(context).pop();
@@ -117,11 +124,11 @@ class HomePageState extends State<HomePage> {
 
     return WillPopScope(
       onWillPop: () async {
-       if (selectedDrawerTag == DASHBOARD)
+       if (selectedDrawer == FragmentMenu.DASHBOARD)
         return true;
        else {
          setState(() {
-           selectedDrawerTag = DASHBOARD ;
+           selectedDrawer = FragmentMenu.DASHBOARD ;
            selectedDrawerIndex = 0;
          });
          return false;
@@ -182,7 +189,7 @@ class HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          body:   _getDrawerItemWidget(selectedDrawerTag),
+          body:   _getDrawerItemWidget(selectedDrawer),
         ),
       ),
     );

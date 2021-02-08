@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:flutter_network/Widget/bezierContainer.dart';
 import 'package:flutter_network/pages/home_page.dart';
+import 'package:flutter_network/utils/constants.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -127,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<http.Response>  login(username, password) async{
-    var url = 'https://sfcfiber.co.ke/v1/api/login';
+    var url = "${BASE_URL}v1/api/login";
    return http.post(url,  body: {'username': "$username", 'pass': "$password"}).timeout(
             Duration(seconds: 30),
             onTimeout: () {
