@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_network/fragments/clusters_fragment.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
 import 'package:flutter_network/fragments/junctions_fragment.dart';
+import 'package:flutter_network/fragments/line_fragment.dart';
+import 'package:flutter_network/fragments/manhole_fragment.dart';
 import 'package:flutter_network/fragments/map_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
@@ -24,10 +27,11 @@ class HomePage extends StatefulWidget {
     DrawerItem(title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
     DrawerItem(title: "Incident", icon: Icons.dangerous, fragmentMenu: FragmentMenu.INCIDENTS),
     DrawerItem(title: "Profile", icon: Icons.person, fragmentMenu: FragmentMenu.VIEW_PROFILE),
-    DrawerItem(title: "Clusters", icon: Icons.group_work, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Clusters", icon: Icons.group_work, fragmentMenu: FragmentMenu.CLUSTERS),
     DrawerItem(title: "Routes", icon: Icons.router_outlined, fragmentMenu: FragmentMenu.ERROR),
     DrawerItem(title: "Junctions", icon: Icons.link, fragmentMenu: FragmentMenu.JUNCTIONS),
     DrawerItem(title: "Customers", icon: Icons.people_alt_outlined, fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(title: "Manhole", icon: Icons.local_post_office_outlined, fragmentMenu: FragmentMenu.MANHOLE),
     DrawerItem(title: "Settings", icon: Icons.settings, fragmentMenu: FragmentMenu.ERROR),
     DrawerItem(title: "About the App", icon: Icons.info, fragmentMenu: FragmentMenu.ERROR),
     DrawerItem(title: "Log out", icon: Icons.logout, fragmentMenu: FragmentMenu.LOGOUT),
@@ -64,6 +68,12 @@ class HomePageState extends State<HomePage> {
         break;
       case FragmentMenu.JUNCTIONS:
         return JunctionsPage();
+        break;
+      case FragmentMenu.CLUSTERS:
+        return ClustersPage();
+        break;
+      case FragmentMenu.MANHOLE:
+        return ManholePage();
         break;
     }
   }
@@ -111,7 +121,7 @@ class HomePageState extends State<HomePage> {
       String username = await prefs.getUsername();
       String email = await prefs.getEmail();
       String phone = await prefs.getPhone();
-      int id = await prefs.getId();
+      String id = await prefs.getId();
       loggedInUser = User(
           id: id,
           firstName: firstName,

@@ -55,15 +55,13 @@ class SessionManager {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getString(this.phone) ?? null;
   }
-
-
-  Future<void> setId(int id) async {
+  Future<void> setId(String id) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt(this.id, id);
+    prefs.setString(this.id, id);
   }
-  Future<int> getId() async {
+  Future<String> getId() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    return pref.getInt(this.id) ?? null;
+    return pref.getString(this.id) ?? null;
   }
 
   Future<void> logout() async {

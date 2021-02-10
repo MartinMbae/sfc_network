@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_network/fragments/line_fragment.dart';
 import 'package:pie_chart/pie_chart.dart';
 
+
 class FirstFragment extends StatelessWidget {
+
+
+
   @override
   Widget build(BuildContext context) {
-
 
     Map<String, double> dataMap = {
       "Resolved": 5,
       "Unresolved": 3,
     };
 
-    return Center(
-      child: PieChart(
+    return Column(
+      children:[
+        PieChart(
         dataMap: dataMap,
         animationDuration: Duration(milliseconds: 1000),
         chartLegendSpacing: 32,
@@ -35,6 +40,10 @@ class FirstFragment extends StatelessWidget {
           showChartValuesOutside: false,
         ),
       ),
+        Divider(color: Colors.black,),
+        GraphBottom(),
+      ],
     );
   }
+
 }

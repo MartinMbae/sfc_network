@@ -2,35 +2,35 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
-import 'package:flutter_network/junction_holder.dart';
-import 'package:flutter_network/models/junction.dart';
+import 'package:flutter_network/cluster_holder.dart';
+import 'package:flutter_network/models/cluster.dart';
 import 'package:flutter_network/pages/empty_screen.dart';
 import 'package:flutter_network/utils/constants.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:http/http.dart' as http;
 
-class JunctionsPage extends StatefulWidget {
+class ClustersPage extends StatefulWidget {
   @override
-  _JunctionsPageState createState() => _JunctionsPageState();
+  _ClustersPageState createState() => _ClustersPageState();
 }
 
-class _JunctionsPageState extends State<JunctionsPage> {
+class _ClustersPageState extends State<ClustersPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchJunctions(),
+      future: fetchClusters(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List<dynamic> junctions = snapshot.data;
-          bool hasData = junctions.length > 0;
+          List<dynamic> clusters = snapshot.data;
+          bool hasData = clusters.length > 0;
           return ListView.builder(
-              itemCount: junctions.length,
+              itemCount: clusters.length,
               itemBuilder: (context, index) {
                 return hasData
                     ? Column(
                         children: [
-                          JunctionHolder(
-                            junction: Junction.fromJson(junctions[index]),
+                          ClusterHolder(
+                            cluster: Cluster.fromJson(clusters[index]),
                             num: index + 1,
                           ),
                           Divider(
@@ -39,7 +39,7 @@ class _JunctionsPageState extends State<JunctionsPage> {
                         ],
                       )
                     : EmptyPage(
-                        icon: Icons.error, message: "No junctions found");
+                        icon: Icons.error, message: "No cluster found");
               });
         } else {
           return Center(child: CircularProgressIndicator());
@@ -48,11 +48,11 @@ class _JunctionsPageState extends State<JunctionsPage> {
     );
   }
 
-  Future<List<dynamic>> fetchJunctions() async {
+  Future<List<dynamic>> fetchClusters() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
-    var url = "${BASE_URL}index.php/v1/api/junctions";
+    var url = "${BASE_URL}index.php/v1/api/cluster";
     Map<String, String> queryParams = {
       'id': "$userId",
     };
@@ -69,11 +69,11 @@ class _JunctionsPageState extends State<JunctionsPage> {
       return null;
     });
     if (response.statusCode != 200) {
-      throw new Exception('Error fetching junctions');
+      throw new Exception('Error fetching clusters');
     }
 
-    List<dynamic> junctions = json.decode(response.body);
+    List<dynamic> clusters = json.decode(response.body);
 
-    return junctions;
+    return clusters;
   }
 }

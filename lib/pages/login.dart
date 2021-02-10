@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
           await prefs.setEmail(email);
           await  prefs.setPhone(phone);
           await prefs.setUsername(username);
-          await prefs.setId(int.parse(id));
+          await prefs.setId(id);
 
           // Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => HomePage()));
           // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()));
