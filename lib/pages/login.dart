@@ -17,12 +17,14 @@ class LoginPage extends StatefulWidget {
   TextEditingController passwordController = new TextEditingController();
 
   final String title;
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   ArsProgressDialog progressDialog;
+
   Widget _entryField(String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -37,7 +39,9 @@ class _LoginPageState extends State<LoginPage> {
             height: 10,
           ),
           TextField(
-            controller: isPassword ? widget.passwordController : widget.usernameController,
+              controller: isPassword
+                  ? widget.passwordController
+                  : widget.usernameController,
               obscureText: isPassword,
               decoration: InputDecoration(
                   border: InputBorder.none,
@@ -48,28 +52,43 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget  _submitButton(BuildContext context) {
-    return GestureDetector (
-      onTap: () async{
-
+  Widget _submitButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
         String username = widget.usernameController.text.trim();
         String password = widget.passwordController.text.trim();
-        if(username.isEmpty || password.isEmpty){
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all the fields")));
+        if (username.isEmpty || password.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Please fill all the fields")));
           return;
         }
         progressDialog.show();
-        http.Response response = await login(username,password);
+        http.Response response = await login(username, password);
         progressDialog.dismiss();
         if (response.statusCode == 200) {
           SessionManager prefs = SessionManager();
           final decoded = jsonDecode(response.body) as Map;
+
+          print(response.body);
           //{"status":false,"message":"Username and password failed to match"}
           //{"success":true,"message":"Login successful","id":"1","first_name":"System","last_name":"Admin","email":"glob.admin","phone":"0987654567","created_at":"2019-03-01 09:31:01"}
-          if (decoded.containsKey("status")){
+          if (decoded.containsKey("status")) {
             var status = decoded['status'];
-            if (!status){
-              DangerAlertBox(context: context, messageText: decoded['message'],title: "Failed");
+            if (!status) {
+              DangerAlertBox(
+                  context: context,
+                  messageText: decoded['message'],
+                  title: "Failed");
+              return;
+            }
+          }
+          if (decoded.containsKey("success")) {
+            var status = decoded['success'];
+            if (!status) {
+              DangerAlertBox(
+                  context: context,
+                  messageText: decoded['message'],
+                  title: "Failed");
               return;
             }
           }
@@ -79,28 +98,35 @@ class _LoginPageState extends State<LoginPage> {
           var lastName = decoded['last_name'];
           var email = decoded['email'];
           var phone = decoded['phone'];
+          var role = decoded['role'];
+
+          // {"success":true,"message":"Login successful","role":"2","id":"2","first_name":"Peter","last_name":"Hillary","email":"kim@gmail.com","phone":"25470989456","created_at":"2021-02-04 17:13:04"}
 
           await prefs.setFirstName(firstName);
           await prefs.setLastName(lastName);
           await prefs.setEmail(email);
-          await  prefs.setPhone(phone);
+          await prefs.setPhone(phone);
           await prefs.setUsername(username);
           await prefs.setId(id);
+          await prefs.setRole(role);
 
           // Navigator.of(context).pushReplacement(new MaterialPageRoute(builder: (BuildContext context) => HomePage()));
           // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()));
           // Navigator.push(  context, MaterialPageRoute(builder: (context) => HomePage()));
 
-          Navigator.pushAndRemoveUntil<dynamic>(context, MaterialPageRoute<dynamic>(
+          Navigator.pushAndRemoveUntil<dynamic>(
+            context,
+            MaterialPageRoute<dynamic>(
               builder: (BuildContext context) => HomePage(),
             ),
-                (route) => false,//if you want to disable back feature set to false
+            (route) => false, //if you want to disable back feature set to false
           );
-
         } else {
-          DangerAlertBox(context: context, messageText: "Something went wrong. Please try again..",title: "Error");
+          DangerAlertBox(
+              context: context,
+              messageText: "Something went wrong. Please try again..",
+              title: "Error");
         }
-
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -127,16 +153,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<http.Response>  login(username, password) async{
+  Future<http.Response> login(username, password) async {
     var url = "${BASE_URL}v1/api/login";
-   return http.post(url,  body: {'username': "$username", 'pass': "$password"}).timeout(
-            Duration(seconds: 30),
-            onTimeout: () {
-              progressDialog.dismiss();
-              DangerAlertBox(context: context, messageText: "Action took so long. Please check your internet connection and try again.",title: "Error");
-              return null;
-            }
-        );
+    return http.post(url, body: {
+      'username': "$username",
+      'pass': "$password"
+    }).timeout(Duration(seconds: 30), onTimeout: () {
+      progressDialog.dismiss();
+      DangerAlertBox(
+          context: context,
+          messageText:
+              "Action took so long. Please check your internet connection and try again.",
+          title: "Error");
+      return null;
+    });
   }
 
   Widget _title() {

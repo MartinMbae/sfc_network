@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/update_password.dart';
 import 'package:flutter_network/models/user.dart';
-import 'package:flutter_network/utils/shared_pref.dart';
 
 class ProfilePage extends StatefulWidget {
 
@@ -255,7 +254,7 @@ class MapScreenState extends State<ProfilePage>
                   child: new RaisedButton(
                 child: new Text("Change Password"),
                 textColor: Colors.white,
-                color: Colors.green,
+                color: Colors.deepPurpleAccent,
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePassword()));
                 },

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/clusters_fragment.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
 import 'package:flutter_network/fragments/junctions_fragment.dart';
-import 'package:flutter_network/fragments/line_fragment.dart';
 import 'package:flutter_network/fragments/manhole_fragment.dart';
 import 'package:flutter_network/fragments/map_fragment.dart';
+import 'package:flutter_network/fragments/patrol_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
 import 'package:flutter_network/fragments/update_password.dart';
@@ -13,28 +13,70 @@ import 'package:flutter_network/pages/login.dart';
 import 'package:flutter_network/utils/constants.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DrawerItem {
   String title;
   IconData icon;
   FragmentMenu fragmentMenu;
-  DrawerItem({@required this.title,@required  this.fragmentMenu, @required this.icon});
+
+  DrawerItem(
+      {@required this.title, @required this.fragmentMenu, @required this.icon});
 }
 
 class HomePage extends StatefulWidget {
   final drawerItems = [
-    DrawerItem(title: "Dashboard", icon: Icons.dashboard, fragmentMenu: FragmentMenu.DASHBOARD),
-    DrawerItem(title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
-    DrawerItem(title: "Incident", icon: Icons.dangerous, fragmentMenu: FragmentMenu.INCIDENTS),
-    DrawerItem(title: "Profile", icon: Icons.person, fragmentMenu: FragmentMenu.VIEW_PROFILE),
-    DrawerItem(title: "Clusters", icon: Icons.group_work, fragmentMenu: FragmentMenu.CLUSTERS),
-    DrawerItem(title: "Routes", icon: Icons.router_outlined, fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(title: "Junctions", icon: Icons.link, fragmentMenu: FragmentMenu.JUNCTIONS),
-    DrawerItem(title: "Customers", icon: Icons.people_alt_outlined, fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(title: "Manhole", icon: Icons.local_post_office_outlined, fragmentMenu: FragmentMenu.MANHOLE),
-    DrawerItem(title: "Settings", icon: Icons.settings, fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(title: "About the App", icon: Icons.info, fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(title: "Log out", icon: Icons.logout, fragmentMenu: FragmentMenu.LOGOUT),
+    DrawerItem(
+        title: "Dashboard",
+        icon: Icons.dashboard,
+        fragmentMenu: FragmentMenu.DASHBOARD),
+    DrawerItem(
+        title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
+    DrawerItem(
+        title: "Incident",
+        icon: Icons.dangerous,
+        fragmentMenu: FragmentMenu.INCIDENTS),
+    DrawerItem(
+        title: "Profile",
+        icon: Icons.person,
+        fragmentMenu: FragmentMenu.VIEW_PROFILE),
+    DrawerItem(
+        title: "Clusters",
+        icon: Icons.group_work,
+        fragmentMenu: FragmentMenu.CLUSTERS),
+    DrawerItem(
+        title: "Patrolling",
+        icon: Icons.select_all_rounded,
+        fragmentMenu: FragmentMenu.PATROL),
+    DrawerItem(
+        title: "Routes",
+        icon: Icons.router_outlined,
+        fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(
+        title: "Junctions",
+        icon: Icons.link,
+        fragmentMenu: FragmentMenu.JUNCTIONS),
+    DrawerItem(
+        title: "Customers",
+        icon: Icons.people_alt_outlined,
+        fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(
+        title: "Manhole",
+        icon: Icons.local_post_office_outlined,
+        fragmentMenu: FragmentMenu.MANHOLE),
+    DrawerItem(
+        title: "Settings",
+        icon: Icons.settings,
+        fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(
+        title: "About the App",
+        icon: Icons.info,
+        fragmentMenu: FragmentMenu.ERROR),
+    DrawerItem(
+        title: "Log out",
+        icon: Icons.logout,
+        fragmentMenu: FragmentMenu.LOGOUT),
   ];
 
   @override
@@ -46,8 +88,26 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   FragmentMenu selectedDrawer = FragmentMenu.DASHBOARD;
   int selectedDrawerIndex = 0;
-
   User loggedInUser;
+  BuildContext mainContext;
+
+  Future<bool> checkPermissions() async {
+    var status = await Permission.location.status;
+    if (status.isUndetermined ||
+        status.isDenied ||
+        status.isPermanentlyDenied) {
+      if (await Permission.location.request().isGranted) {
+        return true;
+      } else {
+        if (status.isPermanentlyDenied){
+          openAppSettings();
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   _getDrawerItemWidget(FragmentMenu fragmentMenu) {
     switch (fragmentMenu) {
@@ -56,15 +116,36 @@ class HomePageState extends State<HomePage> {
       case FragmentMenu.UPDATE_PROFILE:
         return UpdatePassword();
       case FragmentMenu.VIEW_PROFILE:
-        return ProfilePage(loggedInUser: loggedInUser,);
+        return ProfilePage(
+          loggedInUser: loggedInUser,
+        );
       case FragmentMenu.INCIDENTS:
-        return ReportIncident();
+        return FutureBuilder(
+          future: checkPermissions(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              bool hasPermissions = snapshot.data;
+              if (hasPermissions) {
+                return ReportIncident();
+              } else {
+                return Container(
+                  child: Text("Location permissions denied"),
+                );
+              }
+            } else {
+              return Container(
+                child: Text("Location permissions denied"),
+              );
+            }
+          },
+        );
+        break;
       case FragmentMenu.MAP_FRAGMENT:
         return MapFragment();
       case FragmentMenu.LOGOUT:
         break;
       case FragmentMenu.ERROR:
-        return Text("Not Implemmented");
+        return Text("Not Implemented");
         break;
       case FragmentMenu.JUNCTIONS:
         return JunctionsPage();
@@ -75,12 +156,15 @@ class HomePageState extends State<HomePage> {
       case FragmentMenu.MANHOLE:
         return ManholePage();
         break;
+      case FragmentMenu.PATROL:
+        return PatrolPage();
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    mainContext = context;
     List<Widget> drawerOptions = [];
     for (var i = 0; i < widget.drawerItems.length; i++) {
       var d = widget.drawerItems[i];
@@ -90,11 +174,12 @@ class HomePageState extends State<HomePage> {
             leading: Icon(d.icon),
             title: Text(d.title),
             selected: d.fragmentMenu == selectedDrawer,
-            onTap: () async{
-              if (d.fragmentMenu == FragmentMenu.LOGOUT){
+            onTap: () async {
+              if (d.fragmentMenu == FragmentMenu.LOGOUT) {
                 SessionManager prefs = SessionManager();
                 await prefs.logout();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
                 return;
               }
 
@@ -134,17 +219,16 @@ class HomePageState extends State<HomePage> {
 
     return WillPopScope(
       onWillPop: () async {
-       if (selectedDrawer == FragmentMenu.DASHBOARD)
-        return true;
-       else {
-         setState(() {
-           selectedDrawer = FragmentMenu.DASHBOARD ;
-           selectedDrawerIndex = 0;
-         });
-         return false;
-       }
+        if (selectedDrawer == FragmentMenu.DASHBOARD)
+          return true;
+        else {
+          setState(() {
+            selectedDrawer = FragmentMenu.DASHBOARD;
+            selectedDrawerIndex = 0;
+          });
+          return false;
+        }
       },
-
       child: Scaffold(
         primary: true,
         appBar: AppBar(
@@ -175,19 +259,22 @@ class HomePageState extends State<HomePage> {
                             accountName: Text(
                                 "${loggedInUser.firstName} ${loggedInUser.lastName}"),
                             accountEmail: Text("${loggedInUser.email}"),
-                            currentAccountPicture: Image.asset('assets/net1.png'),
+                            currentAccountPicture:
+                                Image.asset('assets/net1.png'),
                           );
                         } else if (snapshot.hasError) {
                           return UserAccountsDrawerHeader(
                             accountName: Text("Error fetching..."),
                             accountEmail: Text("Error fetching"),
-                            currentAccountPicture: Image.asset('assets/net1.png'),
+                            currentAccountPicture:
+                                Image.asset('assets/net1.png'),
                           );
                         } else {
                           return UserAccountsDrawerHeader(
                             accountName: CircularProgressIndicator(),
                             accountEmail: CircularProgressIndicator(),
-                            currentAccountPicture: Image.asset('assets/net1.png'),
+                            currentAccountPicture:
+                                Image.asset('assets/net1.png'),
                           );
                         }
                       },
@@ -199,7 +286,7 @@ class HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          body:   _getDrawerItemWidget(selectedDrawer),
+          body: _getDrawerItemWidget(selectedDrawer),
         ),
       ),
     );

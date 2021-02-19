@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
-import 'package:flutter_network/cluster_holder.dart';
 import 'package:flutter_network/manhole_holder.dart';
-import 'package:flutter_network/models/cluster.dart';
 import 'package:flutter_network/models/manhole.dart';
 import 'package:flutter_network/pages/empty_screen.dart';
 import 'package:flutter_network/utils/constants.dart';
@@ -20,7 +18,7 @@ class _ManholePageState extends State<ManholePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: fetchClusters(),
+      future: fetchManholes(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<dynamic> manhole = snapshot.data;
@@ -50,7 +48,7 @@ class _ManholePageState extends State<ManholePage> {
     );
   }
 
-  Future<List<dynamic>> fetchClusters() async {
+  Future<List<dynamic>> fetchManholes() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();

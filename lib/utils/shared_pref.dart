@@ -7,6 +7,7 @@ class SessionManager {
   final String email = "email";
   final String username = "username";
   final String phone = "phone";
+  final String role = "role";
 
   Future<void> setFirstName(String firstName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,6 +35,16 @@ class SessionManager {
   Future<String> getEmail() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     return pref.getString(this.email) ?? null;
+  }
+
+
+  Future<void> setRole(String role) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(this.role, role);
+  }
+  Future<String> getRole() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getString(this.role) ?? null;
   }
 
 
