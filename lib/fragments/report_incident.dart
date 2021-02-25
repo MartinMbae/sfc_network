@@ -184,212 +184,217 @@ class _ReportIncidentState extends State<ReportIncident> {
   @override
   Widget build(BuildContext context) {
     SDP.init(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
-      child: ListView(
-        children: [
-          Column(
-            children: <Widget>[
-              Text(
-                "Report an Incident",
-                style: TextStyle(
-                    fontSize: 20, decoration: TextDecoration.underline),
-              ),
-              SizedBox(
-                height: SDP.sdp(30),
-              ),
-              FutureBuilder(
-                future: getLocationUpdates(),
-                builder: (builder, snapshot) {
-                  if (snapshot.hasData) {
-                    LocationData locationData = snapshot.data;
-                    latitude = "${locationData.latitude}";
-                    longitude = "${locationData.longitude}";
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Report Incidents"),
+      ),
+      body:  Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
+        child: ListView(
+          children: [
+            Column(
+              children: <Widget>[
+                Text(
+                  "Report an Incident",
+                  style: TextStyle(
+                      fontSize: 20, decoration: TextDecoration.underline),
+                ),
+                SizedBox(
+                  height: SDP.sdp(30),
+                ),
+                FutureBuilder(
+                  future: getLocationUpdates(),
+                  builder: (builder, snapshot) {
+                    if (snapshot.hasData) {
+                      LocationData locationData = snapshot.data;
+                      latitude = "${locationData.latitude}";
+                      longitude = "${locationData.longitude}";
 
-                    return Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                        TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'CRQ Number',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              width: 0,
-                              style: BorderStyle.solid,
+                      return Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'CRQ Number',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "* Required";
+                                } else
+                                  return null;
+                              },
+                              //validatePassword,        //Function to check validation
                             ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return "* Required";
-                          } else
-                            return null;
-                        },
-                        //validatePassword,        //Function to check validation
-                      ),
-                          SizedBox(
-                            height: SDP.sdp(30),
-                          ),
-                          FutureBuilder(
-                              future: fetchManholes(context),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  List<dynamic> manholes = snapshot.data;
-                                  return Container(
-                                    child: DropDownFormField(
-                                      required: true,
-                                      titleText: 'Select manhole',
-                                      hintText: 'Please choose one',
-                                      value: manhole_id,
-                                      onSaved: (value) {
-                                        setState(() {
-                                          manhole_id = value;
-                                        });
-                                      },
-                                      onChanged: (value) {
-                                        setState(() {
-                                          manhole_id = value;
-                                        });
-                                      },
-                                      dataSource: manholes,
-                                      textField: 'manholename',
-                                      valueField: 'id',
-                                    ),
-                                  );
-                                } else {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                              }),
-                          SizedBox(
-                            height: SDP.sdp(30),
-                          ),
-                          FutureBuilder(
-                              future: fetchTypes(context),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  List<dynamic> types = snapshot.data;
-                                  return Container(
-                                    child: DropDownFormField(
-                                      titleText:
-                                          'Select maintenance type required',
-                                      hintText: 'Please choose one',
-                                      value: maintenance_type_id,
-                                      onSaved: (value) {
-                                        setState(() {
-                                          maintenance_type_id = value;
-                                        });
-                                      },
-                                      onChanged: (value) {
-                                        setState(() {
-                                          maintenance_type_id = value;
-                                        });
-                                      },
-                                      dataSource: types,
-                                      textField: 'type_name',
-                                      valueField: 'id',
-                                    ),
-                                  );
-                                } else {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                              }),
-                          SizedBox(
-                            height: SDP.sdp(30),
-                          ),
-                          TextFormField(
-                            controller: descController,
-                            maxLength: 200,
-                            maxLines: 5,
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                print ("Error");
-                                return "* Required";
-                              } else
-                                return null;
-                            },
-                            textAlign: TextAlign.start,
-                            decoration: InputDecoration(
-                              labelText: 'Describe the incident',
-                              alignLabelWithHint: true,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  width: 0,
-                                  style: BorderStyle.solid,
+                            SizedBox(
+                              height: SDP.sdp(30),
+                            ),
+                            FutureBuilder(
+                                future: fetchManholes(context),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    List<dynamic> manholes = snapshot.data;
+                                    return Container(
+                                      child: DropDownFormField(
+                                        required: true,
+                                        titleText: 'Select manhole',
+                                        hintText: 'Please choose one',
+                                        value: manhole_id,
+                                        onSaved: (value) {
+                                          setState(() {
+                                            manhole_id = value;
+                                          });
+                                        },
+                                        onChanged: (value) {
+                                          setState(() {
+                                            manhole_id = value;
+                                          });
+                                        },
+                                        dataSource: manholes,
+                                        textField: 'manholename',
+                                        valueField: 'id',
+                                      ),
+                                    );
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                }),
+                            SizedBox(
+                              height: SDP.sdp(30),
+                            ),
+                            FutureBuilder(
+                                future: fetchTypes(context),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    List<dynamic> types = snapshot.data;
+                                    return Container(
+                                      child: DropDownFormField(
+                                        titleText:
+                                        'Select maintenance type required',
+                                        hintText: 'Please choose one',
+                                        value: maintenance_type_id,
+                                        onSaved: (value) {
+                                          setState(() {
+                                            maintenance_type_id = value;
+                                          });
+                                        },
+                                        onChanged: (value) {
+                                          setState(() {
+                                            maintenance_type_id = value;
+                                          });
+                                        },
+                                        dataSource: types,
+                                        textField: 'type_name',
+                                        valueField: 'id',
+                                      ),
+                                    );
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                }),
+                            SizedBox(
+                              height: SDP.sdp(30),
+                            ),
+                            TextFormField(
+                              controller: descController,
+                              maxLength: 200,
+                              maxLines: 5,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  print ("Error");
+                                  return "* Required";
+                                } else
+                                  return null;
+                              },
+                              textAlign: TextAlign.start,
+                              decoration: InputDecoration(
+                                labelText: 'Describe the incident',
+                                alignLabelWithHint: true,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.solid,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: SDP.sdp(30),
-                          ),
-                          _image == null
-                              ?  GestureDetector(
-                                child: Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.start,
-                            children: [
-                                Icon(Icons.add_a_photo),
-                                SizedBox(
-                                  width: 10,
+                            SizedBox(
+                              height: SDP.sdp(30),
+                            ),
+                            _image == null
+                                ?  GestureDetector(
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.add_a_photo),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text('Tap here to attach an image')
+                                ],
+                              ),
+                              onTap: getImage,
+                            )
+                                : Image.file(_image),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: MaterialButton(
+                                color: Theme.of(context).accentColor,
+                                child: Text(
+                                  "Submit",
+                                  style: TextStyle(color: Colors.white),
                                 ),
-                                Text('Tap here to attach an image')
-                            ],
-                          ),
-                            onTap: getImage,
-                              )
-                              : Image.file(_image),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: MaterialButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text(
-                    "Submit",
-                    style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                    if (_formKey.currentState.validate()) {
+                                onPressed: () async {
+                                  if (_formKey.currentState.validate()) {
 
 
-                    if (maintenance_type_id == null || manhole_id  == null){
+                                    if (maintenance_type_id == null || manhole_id  == null){
 
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text("Please Select all the fields"),
-                    duration: Duration(seconds: 3),
-                    ));
-                    return;
-                    }
+                                      Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text("Please Select all the fields"),
+                                        duration: Duration(seconds: 3),
+                                      ));
+                                      return;
+                                    }
 
-                    SessionManager prefs = SessionManager();
-                    var id = await prefs.getId();
-                    submitIncidence(id, crqController.text,
-                    descController.text, _image, context);
+                                    SessionManager prefs = SessionManager();
+                                    var id = await prefs.getId();
+                                    submitIncidence(id, crqController.text,
+                                        descController.text, _image, context);
+                                  } else {
+                                    print("validation failed");
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     } else {
-                    print("validation failed");
+                      return Center(child: CircularProgressIndicator());
                     }
-                    },
-                    ),
-                  ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ],
-          )
-        ],
+                  },
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

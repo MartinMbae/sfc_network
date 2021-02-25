@@ -68,6 +68,8 @@ class _ManholePageState extends State<ManholePage> {
           title: "Error");
       return null;
     });
+
+
     if (response.statusCode != 200) {
       throw new Exception('Error fetching manholes');
     }

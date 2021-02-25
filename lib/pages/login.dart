@@ -68,11 +68,7 @@ class _LoginPageState extends State<LoginPage> {
         if (response.statusCode == 200) {
           SessionManager prefs = SessionManager();
           final decoded = jsonDecode(response.body) as Map;
-
-          print(response.body);
-          //{"status":false,"message":"Username and password failed to match"}
-          //{"success":true,"message":"Login successful","id":"1","first_name":"System","last_name":"Admin","email":"glob.admin","phone":"0987654567","created_at":"2019-03-01 09:31:01"}
-          if (decoded.containsKey("status")) {
+ if (decoded.containsKey("status")) {
             var status = decoded['status'];
             if (!status) {
               DangerAlertBox(

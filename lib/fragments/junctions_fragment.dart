@@ -21,26 +21,39 @@ class _JunctionsPageState extends State<JunctionsPage> {
       future: fetchJunctions(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List<dynamic> junctions = snapshot.data;
-          bool hasData = junctions.length > 0;
-          return ListView.builder(
-              itemCount: junctions.length,
-              itemBuilder: (context, index) {
-                return hasData
-                    ? Column(
-                        children: [
-                          JunctionHolder(
-                            junction: Junction.fromJson(junctions[index]),
-                            num: index + 1,
-                          ),
-                          Divider(
-                            color: Colors.black,
-                          )
-                        ],
-                      )
-                    : EmptyPage(
+          String response = snapshot.data;
+          final decoded = jsonDecode(response) as Map;
+          if (decoded.containsKey("success")) {
+            var success = decoded['success'];
+            if (!success) {
+              return EmptyPage(
+                  icon: Icons.error, message: decoded['message']);
+            } else {
+              List<dynamic> junctions =decoded['data'];
+              bool hasData = junctions.length > 0;
+              return ListView.builder(
+                  itemCount: junctions.length,
+                  itemBuilder: (context, index) {
+                    return hasData
+                        ? Column(
+                      children: [
+                        JunctionHolder(
+                          junction: Junction.fromJson(junctions[index]),
+                          num: index + 1,
+                        ),
+                        Divider(
+                          color: Colors.black,
+                        )
+                      ],
+                    )
+                        : EmptyPage(
                         icon: Icons.error, message: "No junctions found");
-              });
+                  });
+            }
+          }else{
+            return Container();
+          }
+
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -48,7 +61,7 @@ class _JunctionsPageState extends State<JunctionsPage> {
     );
   }
 
-  Future<List<dynamic>> fetchJunctions() async {
+  Future<String> fetchJunctions() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
@@ -72,8 +85,6 @@ class _JunctionsPageState extends State<JunctionsPage> {
       throw new Exception('Error fetching junctions');
     }
 
-    List<dynamic> junctions = json.decode(response.body);
-
-    return junctions;
+    return response.body;
   }
 }

@@ -15,7 +15,7 @@ class ManholeHolder extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: 120,
+      height: 130,
       width: size.width,
       color: Colors.white,
       padding: EdgeInsets.only(left: 10),
@@ -48,7 +48,12 @@ class ManholeHolder extends StatelessWidget {
                     ],
                   ),
                 ),
-                SimpleRow(title: "Description", subtitle:manhole.description),
+
+                SimpleRow(title: "Location Level", subtitle:manhole.locationlevel),
+                SimpleRow(title: "Location System", subtitle:manhole.locationsystem),
+                SimpleRow(title: "Latitude", subtitle:manhole.latitude),
+                SimpleRow(title: "Longitude", subtitle:manhole.longitude),
+                SimpleRow(title: "Status", subtitle:manhole.status, subtitleColor: Colors.green[600], ),
               ],
             ),
           ),

@@ -14,7 +14,7 @@ class JunctionHolder extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: 120,
+      height: 260,
       width: size.width,
       color: Colors.white,
       padding: EdgeInsets.only(left: 10),
@@ -47,10 +47,20 @@ class JunctionHolder extends StatelessWidget {
                     ],
                   ),
                 ),
+
                 SimpleRow(title: "Type", subtitle:junction.comp_type),
                 SimpleRow(title: "Category", subtitle: junction.category),
                 SimpleRow(title: "Sub Category", subtitle: junction.subcategory),
                 SimpleRow(title: "Owner", subtitle: junction.owner),
+                SimpleRow(title: "Cluster", subtitle: junction.cluster_id),
+                SimpleRow(title: "Technique", subtitle: junction.technique),
+                SimpleRow(title: "aLocation", subtitle: junction.alocation),
+                SimpleRow(title: "aLocation Description", subtitle: junction.alocationdesc),
+                SimpleRow(title: "zLocation", subtitle: junction.zlocation),
+                SimpleRow(title: "zLocation Description", subtitle: junction.zlocationdesc),
+                SimpleRow(title: "Effective Length", subtitle: junction.effectivelength),
+                SimpleRow(title: "Location Type", subtitle: junction.location_type),
+                SimpleRow(title: "Status", subtitle: junction.status, subtitleColor: Colors.green[600],),
               ],
             ),
           ),

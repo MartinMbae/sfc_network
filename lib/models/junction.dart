@@ -4,6 +4,9 @@ class Junction{
   alocationdesc,zlocation,zlocationdesc,effectivelength,geolength,owner,status,status_date,routing,location_type,
   usedby,created_on,created_by,updated_on,updated_by;
 
+  // {"id":"1","cluster_id":"Cluster 1","component_name":"JB-MH-BGM-00012-01","category":"Container",
+  // "owner":"Huawei","created_at":null}
+
   Junction({this.id, this.cluster_id, this.component_name, this.comp_type, this.category, this.subcategory, this.technique, this.function, this.dimension, this.description, this.alocation, this.alocationdesc, this.zlocation, this.zlocationdesc, this.effectivelength, this.geolength, this.owner, this.status, this.status_date, this.routing, this.location_type, this.usedby, this.created_on, this.created_by, this.updated_on, this.updated_by});
 
   static Junction fromJson(dynamic json) {

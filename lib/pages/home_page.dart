@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/clusters_fragment.dart';
+import 'package:flutter_network/fragments/engineer_incidents_page.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
+import 'package:flutter_network/fragments/incidents_page.dart';
 import 'package:flutter_network/fragments/junctions_fragment.dart';
 import 'package:flutter_network/fragments/manhole_fragment.dart';
 import 'package:flutter_network/fragments/map_fragment.dart';
@@ -34,7 +36,7 @@ class HomePage extends StatefulWidget {
     DrawerItem(
         title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
     DrawerItem(
-        title: "Incident",
+        title: "Incidents",
         icon: Icons.dangerous,
         fragmentMenu: FragmentMenu.INCIDENTS),
     DrawerItem(
@@ -50,29 +52,13 @@ class HomePage extends StatefulWidget {
         icon: Icons.select_all_rounded,
         fragmentMenu: FragmentMenu.PATROL),
     DrawerItem(
-        title: "Routes",
-        icon: Icons.router_outlined,
-        fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(
         title: "Junctions",
         icon: Icons.link,
         fragmentMenu: FragmentMenu.JUNCTIONS),
     DrawerItem(
-        title: "Customers",
-        icon: Icons.people_alt_outlined,
-        fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(
-        title: "Manhole",
+        title: "Manholes",
         icon: Icons.local_post_office_outlined,
         fragmentMenu: FragmentMenu.MANHOLE),
-    DrawerItem(
-        title: "Settings",
-        icon: Icons.settings,
-        fragmentMenu: FragmentMenu.ERROR),
-    DrawerItem(
-        title: "About the App",
-        icon: Icons.info,
-        fragmentMenu: FragmentMenu.ERROR),
     DrawerItem(
         title: "Log out",
         icon: Icons.logout,
@@ -91,25 +77,8 @@ class HomePageState extends State<HomePage> {
   User loggedInUser;
   BuildContext mainContext;
 
-  Future<bool> checkPermissions() async {
-    var status = await Permission.location.status;
-    if (status.isUndetermined ||
-        status.isDenied ||
-        status.isPermanentlyDenied) {
-      if (await Permission.location.request().isGranted) {
-        return true;
-      } else {
-        if (status.isPermanentlyDenied){
-          openAppSettings();
-        }
-      }
-      return false;
-    } else {
-      return true;
-    }
-  }
 
-  _getDrawerItemWidget(FragmentMenu fragmentMenu) {
+  _getDrawerItemWidget(FragmentMenu fragmentMenu, bool isEngineer){
     switch (fragmentMenu) {
       case FragmentMenu.DASHBOARD:
         return FirstFragment();
@@ -120,25 +89,11 @@ class HomePageState extends State<HomePage> {
           loggedInUser: loggedInUser,
         );
       case FragmentMenu.INCIDENTS:
-        return FutureBuilder(
-          future: checkPermissions(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              bool hasPermissions = snapshot.data;
-              if (hasPermissions) {
-                return ReportIncident();
-              } else {
-                return Container(
-                  child: Text("Location permissions denied"),
-                );
-              }
-            } else {
-              return Container(
-                child: Text("Location permissions denied"),
-              );
-            }
-          },
-        );
+        if (isEngineer){
+          return EngineerIncidentsPage();
+        }else{
+          return Incidents();
+        }
         break;
       case FragmentMenu.MAP_FRAGMENT:
         return MapFragment();
@@ -207,13 +162,15 @@ class HomePageState extends State<HomePage> {
       String email = await prefs.getEmail();
       String phone = await prefs.getPhone();
       String id = await prefs.getId();
+      String role = await prefs.getRole();
       loggedInUser = User(
           id: id,
           firstName: firstName,
           lastName: lastName,
           username: username,
           email: email,
-          phone: phone);
+          phone: phone,
+          role: role);
       return loggedInUser;
     }
 
@@ -286,7 +243,19 @@ class HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          body: _getDrawerItemWidget(selectedDrawer),
+          body:  FutureBuilder(
+            future: getUserDetails(),
+    builder: (context, snapshot){
+
+    if (snapshot.hasData) {
+      User loggedInUser = snapshot.data;
+      return  _getDrawerItemWidget(selectedDrawer, loggedInUser.role == "2");
+    }else{
+      return Container();
+    }
+    }
+
+          )
         ),
       ),
     );
