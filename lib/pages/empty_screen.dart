@@ -5,14 +5,15 @@ class EmptyPage extends StatelessWidget {
 
   final  icon;
   final String message;
+  final height;
 
-  const EmptyPage({Key key, @required this.icon, @required this.message}) : super(key: key);
+  const EmptyPage({Key key, @required this.icon, @required this.message, this.height}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+      height: height == null ? MediaQuery.of(context).size.height : height,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

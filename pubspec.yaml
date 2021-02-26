@@ -44,6 +44,7 @@ dependencies:
   cached_network_image: ^2.5.0
   flip_card: ^0.4.4
   prompt_dialog: ^0.1.4
+  cupertino_stepper: any
 
 
 dev_dependencies:

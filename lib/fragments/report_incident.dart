@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
 import 'package:flutter_network/utils/constants.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_network/utils/sdb_resizer.dart';
 import 'package:http/http.dart' as http;
@@ -231,6 +230,7 @@ class _ReportIncidentState extends State<ReportIncident> {
                                 } else
                                   return null;
                               },
+                              controller: crqController,
                               //validatePassword,        //Function to check validation
                             ),
                             SizedBox(
@@ -350,7 +350,16 @@ class _ReportIncidentState extends State<ReportIncident> {
                               ),
                               onTap: getImage,
                             )
-                                : Image.file(_image),
+                                :
+                            Card(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: Image.file(_image),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 5,
+                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                            ),
 
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),

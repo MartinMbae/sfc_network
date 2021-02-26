@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_network/fragments/clusters_fragment.dart';
 import 'package:flutter_network/fragments/engineer_incidents_page.dart';
+import 'package:flutter_network/fragments/engineer_patrol_page.dart';
 import 'package:flutter_network/fragments/first_fragment.dart';
 import 'package:flutter_network/fragments/incidents_page.dart';
 import 'package:flutter_network/fragments/junctions_fragment.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_network/fragments/map_fragment.dart';
 import 'package:flutter_network/fragments/patrol_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
+import 'package:flutter_network/fragments/technician_patrol_selection.dart';
 import 'package:flutter_network/fragments/update_password.dart';
 import 'package:flutter_network/models/user.dart';
 import 'package:flutter_network/pages/login.dart';
@@ -112,7 +114,11 @@ class HomePageState extends State<HomePage> {
         return ManholePage();
         break;
       case FragmentMenu.PATROL:
-        return PatrolPage();
+        if (isEngineer){
+          return EngineerPatrolPage();
+        }else{
+          return TechnicianPatrolSelection();
+        }
         break;
     }
   }
