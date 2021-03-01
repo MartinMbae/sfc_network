@@ -52,7 +52,7 @@ class _ClustersPageState extends State<ClustersPage> {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
-    var url = "${BASE_URL}index.php/v1/api/cluster";
+    var url = "${BASE_URL}index.php/v1/api/clustersroutes";
     Map<String, String> queryParams = {
       'id': "$userId",
     };

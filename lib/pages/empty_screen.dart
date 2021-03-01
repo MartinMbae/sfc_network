@@ -17,9 +17,9 @@ class EmptyPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 60,color: Colors.deepPurple,),
+          Icon(icon, size: 60,color: Colors.green,),
           SizedBox(height: 15,),
-          Text(message, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.deepPurple),)
+          Text(message, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.black),)
         ],
       ),
     );

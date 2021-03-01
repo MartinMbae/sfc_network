@@ -45,11 +45,18 @@ dependencies:
   flip_card: ^0.4.4
   prompt_dialog: ^0.1.4
   cupertino_stepper: any
+  flutter_launcher_icons: ^0.8.1
+
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/app_logo.jpg"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

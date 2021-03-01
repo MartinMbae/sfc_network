@@ -1,13 +1,19 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class GraphBottom extends StatelessWidget {
+class GraphBottom extends StatefulWidget {
 
 
 
+  @override
+  _GraphBottomState createState() => _GraphBottomState();
+}
+
+class _GraphBottomState extends State<GraphBottom> {
   List<Color> gradientColors = [
-    Colors.deepPurple,
-    Colors.purpleAccent,
+    Colors.green,
+    Colors.green[400],
+    Colors.green[800],
   ];
 
   @override
@@ -45,7 +51,6 @@ class GraphBottom extends StatelessWidget {
         ],
       );
   }
-
 
   LineChartData mainData() {
     return LineChartData(

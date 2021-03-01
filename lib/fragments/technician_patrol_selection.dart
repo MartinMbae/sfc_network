@@ -16,7 +16,7 @@ class TechnicianPatrolSelection extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(Icons.report, color: Colors.deepPurple,),
+            leading: Icon(Icons.report, color: Colors.green,),
             title: Text("Perform Patrol"),
             onTap: ()async{
               Navigator.push(context, MaterialPageRoute(builder: (context)=> PatrolPage()));
@@ -26,7 +26,7 @@ class TechnicianPatrolSelection extends StatelessWidget {
             color: Colors.grey,
           ),
           ListTile(
-            leading: Icon(Icons.remove_red_eye, color: Colors.deepPurple,),
+            leading: Icon(Icons.remove_red_eye, color: Colors.green,),
             title: Text("Review My previous Patrols"),
             onTap: (){
               Navigator.push(context, MaterialPageRoute(builder: (context)=> TechnicianPatrolPage()));

@@ -130,7 +130,7 @@ class UpdatePassword extends StatelessWidget {
                     RaisedButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
-                          side: BorderSide(color: Colors.purple)),
+                          side: BorderSide(color: Colors.greenAccent)),
                       onPressed: () async {
                         if (formKey.currentState.validate()) {
                           String newPass = newPassController.text;
@@ -189,7 +189,7 @@ class UpdatePassword extends StatelessWidget {
                           }
                         }
                       },
-                      color: Colors.deepPurple,
+                      color: Colors.green[700],
                       textColor: Colors.white,
                       child: Text("Update".toUpperCase(),
                           style: TextStyle(fontSize: 14)),

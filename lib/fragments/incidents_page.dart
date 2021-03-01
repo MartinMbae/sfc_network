@@ -33,7 +33,7 @@ class Incidents extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(Icons.report, color: Colors.deepPurple,),
+            leading: Icon(Icons.report, color: Colors.green,),
             title: Text("Report an incident"),
             onTap: ()async{
 
@@ -49,7 +49,7 @@ class Incidents extends StatelessWidget {
             color: Colors.grey,
           ),
           ListTile(
-            leading: Icon(Icons.remove_red_eye, color: Colors.deepPurple,),
+            leading: Icon(Icons.remove_red_eye, color: Colors.green,),
             title: Text("View Incidents"),
             onTap: (){
               Navigator.push(context, MaterialPageRoute(builder: (context)=> TechnicianIncidentsPage()));

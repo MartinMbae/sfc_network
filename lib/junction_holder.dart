@@ -23,7 +23,7 @@ class JunctionHolder extends StatelessWidget {
           Container(
               margin: EdgeInsets.symmetric(vertical: 20),
               decoration: new BoxDecoration(
-                color: Colors.deepPurple,
+                color: Colors.green[700],
                 borderRadius: BorderRadius.circular(10),
               ),
               padding: EdgeInsets.symmetric(horizontal: 10),

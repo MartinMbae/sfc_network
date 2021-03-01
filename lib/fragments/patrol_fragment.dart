@@ -158,7 +158,7 @@ class _PatrolPageState extends State<PatrolPage> {
                   height: 20,
                 ),
                 RaisedButton(
-                  color: Colors.deepPurple,
+                  color: Colors.green,
                   child: Text(
                     'Proceed',
                     style: TextStyle(color: Colors.white),
@@ -362,7 +362,7 @@ class _PatrolPageState extends State<PatrolPage> {
                         },
                       ),
                       RaisedButton(
-                        color: Colors.deepPurple,
+                        color: Colors.green,
                         child: Text(
                           'Submit',
                           style: TextStyle(color: Colors.white),

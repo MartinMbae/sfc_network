@@ -254,7 +254,7 @@ class MapScreenState extends State<ProfilePage>
                   child: new RaisedButton(
                 child: new Text("Change Password"),
                 textColor: Colors.white,
-                color: Colors.deepPurpleAccent,
+                    color: Colors.green[700],
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePassword()));
                 },
