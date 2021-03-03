@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:ars_progress_dialog/ars_progress_dialog.dart';
+import 'package:async/async.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,8 @@ import 'package:flutter_network/utils/constants.dart';
 import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import 'package:path/path.dart';
-import 'package:async/async.dart';
 
 
 
@@ -29,6 +30,9 @@ class _PatrolPageState extends State<PatrolPage> {
   String selection, condition;
   String manhole_id, junction_id;
   TextEditingController descController = new TextEditingController();
+
+
+  String latitude, longitude;
 
   final picker = ImagePicker();
 
@@ -105,78 +109,107 @@ class _PatrolPageState extends State<PatrolPage> {
     }
   }
 
+  Future<LocationData> getLocationUpdates() async {
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+    }
+    _locationData = await location.getLocation();
+    return _locationData;
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+
     c = new PageController();
 
-    return // IgnorePointer(
-        Scaffold(
+    return  Scaffold(
           appBar: AppBar(title: Text("Patrol"),),
           body: PageView(
       physics: new NeverScrollableScrollPhysics(),
       controller: c,
       // controller: PageController(viewportFraction: 0.8),
       children: [
-          Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset('assets/patrol.png'),
-                SizedBox(height: 30,),
-                Text("Report the status of the site elements".toUpperCase(), textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
-                ),
+        FutureBuilder(
+          future: getLocationUpdates(),
+          builder: (builder, snapshot) {
+            if (snapshot.hasData) {
+              LocationData locationData = snapshot.data;
+              latitude = "${locationData.latitude}";
+              longitude = "${locationData.longitude}";
+              return Container(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/patrol.png'),
+                    SizedBox(height: 30,),
+                    Text("Report the status of the site elements".toUpperCase(), textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
+                    ),
 
-                SizedBox(height: 30,),
-                DropDownFormField(
-                  titleText: 'Select element type',
-                  hintText: 'Please choose one',
-                  value: selection,
-                  onSaved: (value) {
-                    setState(() {
-                      selection = value;
-                    });
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      selection = value;
-                    });
-                  },
-                  dataSource: [
-                    {
-                      "value": "Junction",
-                    },
-                    {
-                      "value": "Manhole",
-                    },
+                    SizedBox(height: 30,),
+                    DropDownFormField(
+                      titleText: 'Select element type',
+                      hintText: 'Please choose one',
+                      value: selection,
+                      onSaved: (value) {
+                        setState(() {
+                          selection = value;
+                        });
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          selection = value;
+                        });
+                      },
+                      dataSource: [
+                        {
+                          "value": "Junction",
+                        },
+                        {
+                          "value": "Manhole",
+                        },
+                      ],
+                      textField: 'value',
+                      valueField: 'value',
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    RaisedButton(
+                      color: Colors.green,
+                      child: Text(
+                        'Proceed',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () async {
+                        if (selection == null) {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text("You have not made any selection")));
+                        } else {
+                          c.animateTo(MediaQuery.of(context).size.width,
+                              duration: new Duration(seconds: 1),
+                              curve: Curves.easeIn);
+                        }
+                      },
+                    ),
                   ],
-                  textField: 'value',
-                  valueField: 'value',
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                RaisedButton(
-                  color: Colors.green,
-                  child: Text(
-                    'Proceed',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () async {
-                    if (selection == null) {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text("You have not made any selection")));
-                    } else {
-                      c.animateTo(MediaQuery.of(context).size.width,
-                          duration: new Duration(seconds: 1),
-                          curve: Curves.easeIn);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+
           Container(
             color: Colors.red[200].withOpacity(0.2),
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -419,10 +452,12 @@ class _PatrolPageState extends State<PatrolPage> {
         );
   }
 
+
+
   Future<void> submitPatrollingMessage(
-      String site_type,
-      String site_id,
-      String tech_id,
+      String siteType,
+      String siteId,
+      String techId,
       String status,
       String desc,
       File imageFile,
@@ -440,7 +475,7 @@ class _PatrolPageState extends State<PatrolPage> {
         backgroundColor: Color(0x33000000),
         animationDuration: Duration(milliseconds: 500));
 
-    progressDialog.show(); // show dialog
+    progressDialog.show();
 
     var url = BASE_URL + 'index.php/v1/api/patrolling';
     var stream =
@@ -449,11 +484,13 @@ class _PatrolPageState extends State<PatrolPage> {
     var uri = Uri.parse(url);
     var request = new http.MultipartRequest("POST", uri);
 
-    request.fields['tech_id'] = tech_id;
-    request.fields['site_id'] = site_id;
-    request.fields['site_type'] = site_type;
+    request.fields['tech_id'] = techId;
+    request.fields['site_id'] = siteId;
+    request.fields['site_type'] = siteType;
     request.fields['description'] = desc;
     request.fields['status'] = status;
+    request.fields['longitude'] = longitude;
+    request.fields['latitude'] = latitude;
 
     var multipartFile = new http.MultipartFile(
       'photo',

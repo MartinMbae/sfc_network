@@ -9,6 +9,8 @@ class EngineerIncident {
       reported_on,
       incident_image,
       status,
+      latitude,
+      longitude,
       created_at;
 
   EngineerIncident(
@@ -22,6 +24,8 @@ class EngineerIncident {
       this.reported_on,
       this.status,
       this.incident_image,
+      this.latitude,
+      this.longitude,
       this.created_at});
 
   static EngineerIncident fromJson(dynamic json) {
@@ -36,6 +40,8 @@ class EngineerIncident {
       reported_on: json['reported_on'],
       status: json['status'],
       incident_image: json['incident_image'],
+      longitude: json['longitude'],
+      latitude: json['latitude'],
       created_at: json['created_at'],
     );
   }

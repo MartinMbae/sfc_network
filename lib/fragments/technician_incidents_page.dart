@@ -26,7 +26,6 @@ class _TechnicianIncidentsPageState extends State<TechnicianIncidentsPage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             String response = snapshot.data;
-
               final decoded = jsonDecode(response) as Map;
               if (decoded.containsKey("success")) {
                 var success = decoded['success'];
