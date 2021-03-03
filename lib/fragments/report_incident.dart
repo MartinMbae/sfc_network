@@ -27,7 +27,6 @@ class _ReportIncidentState extends State<ReportIncident> {
 
   String latitude, longitude;
 
-  TextEditingController crqController = new TextEditingController();
   TextEditingController descController = new TextEditingController();
 
   final picker = ImagePicker();
@@ -44,7 +43,7 @@ class _ReportIncidentState extends State<ReportIncident> {
     });
   }
 
-  Future<void> submitIncidence(String techId, String crq, String desc,
+  Future<void> submitIncidence(String techId, String desc,
       File imageFile, BuildContext context) async {
     if (imageFile == null) {
       Scaffold.of(context).showSnackBar(SnackBar(
@@ -69,7 +68,6 @@ class _ReportIncidentState extends State<ReportIncident> {
     var request = new http.MultipartRequest("POST", uri);
 
     request.fields['tech_id'] = techId;
-    request.fields['crq_no'] = crq;
     request.fields['manhole_id'] = manhole_id;
     request.fields['incident_desc'] = desc;
     request.fields['type'] = maintenance_type_id;
@@ -92,7 +90,6 @@ class _ReportIncidentState extends State<ReportIncident> {
         if (responseMessage.containsKey("success")) {
           bool success = responseMessage['success'];
           if (success) {
-            crqController.text = "";
             descController.text = "";
             setState(() {
               _image = null;
@@ -213,26 +210,6 @@ class _ReportIncidentState extends State<ReportIncident> {
                         key: _formKey,
                         child: Column(
                           children: [
-                            TextFormField(
-                              decoration: InputDecoration(
-                                labelText: 'CRQ Number',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    width: 0,
-                                    style: BorderStyle.solid,
-                                  ),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return "* Required";
-                                } else
-                                  return null;
-                              },
-                              controller: crqController,
-                              //validatePassword,        //Function to check validation
-                            ),
                             SizedBox(
                               height: SDP.sdp(30),
                             ),
@@ -351,14 +328,30 @@ class _ReportIncidentState extends State<ReportIncident> {
                               onTap: getImage,
                             )
                                 :
-                            Card(
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              child: Image.file(_image),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              elevation: 5,
-                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                            Column(
+                              children: [
+                                Card(
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  child: Image.file(_image),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  elevation: 5,
+                                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                ),
+                                GestureDetector(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.edit),
+                                      SizedBox(width: 10,),
+                                      Text("Edit Image"),
+                                    ],
+                                  ),
+                                  onTap:getImage,
+                                )
+                              ],
                             ),
 
                             Padding(
@@ -384,7 +377,7 @@ class _ReportIncidentState extends State<ReportIncident> {
 
                                     SessionManager prefs = SessionManager();
                                     var id = await prefs.getId();
-                                    submitIncidence(id, crqController.text,
+                                    submitIncidence(id,
                                         descController.text, _image, context);
                                   } else {
                                     print("validation failed");

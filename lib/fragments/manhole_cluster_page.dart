@@ -11,7 +11,6 @@ import 'package:flutter_network/utils/shared_pref.dart';
 import 'package:http/http.dart' as http;
 
 class ManholeClusterPage extends StatefulWidget {
-
   final Cluster cluster;
 
   const ManholeClusterPage({Key key, @required this.cluster}) : super(key: key);
@@ -31,7 +30,18 @@ class _ManholeClusterPageState extends State<ManholeClusterPage> {
         future: fetchManholesCLuster(widget.cluster.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<dynamic> manhole = snapshot.data;
+            String response = snapshot.data;
+            try {
+              final decoded = jsonDecode(response) as Map;
+              if (decoded.containsKey("success")) {
+                String message = decoded['message'];
+                return EmptyPage(icon: Icons.error, message: message);
+              }
+            } catch (e) {
+              print("Errror ${e.toString()}");
+            }
+
+            List<dynamic> manhole = json.decode(response);
             bool hasData = manhole.length > 0;
             return ListView.builder(
                 itemCount: manhole.length,
@@ -59,11 +69,13 @@ class _ManholeClusterPageState extends State<ManholeClusterPage> {
     );
   }
 
-  Future<List<dynamic>> fetchManholesCLuster(String clusterId) async {
+  Future<String> fetchManholesCLuster(String clusterId) async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
     var url = "${BASE_URL}index.php/v1/api/clustersroutes/$clusterId";
+
+    print(url);
     Map<String, String> queryParams = {
       'id': "$userId",
     };
@@ -83,8 +95,6 @@ class _ManholeClusterPageState extends State<ManholeClusterPage> {
       throw new Exception('Error fetching manholes');
     }
 
-    List<dynamic> manhole = json.decode(response.body);
-
-    return manhole;
+    return response.body;
   }
 }

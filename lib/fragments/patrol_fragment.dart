@@ -326,14 +326,30 @@ class _PatrolPageState extends State<PatrolPage> {
                           onTap: getImage,
                         )
                       :
-                  Card(
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    child: Image.file(_image),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  Column(
+                    children: [
+                      Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        child: Image.file(_image),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 5,
+                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                      ),
+                      GestureDetector(
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.edit),
+                            SizedBox(width: 10,),
+                            Text("Edit Image"),
+                          ],
+                        ),
+                        onTap:getImage,
+                      )
+                    ],
                   ),
 
                   SizedBox(

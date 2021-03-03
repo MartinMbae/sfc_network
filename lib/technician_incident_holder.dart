@@ -99,6 +99,9 @@ class _TechnicianIncidentHolderState extends State<TechnicianIncidentHolder> {
                         title: "Man hole",
                         subtitle: widget.engineerIncident.manhole_name),
                     SimpleRow(
+                        title: "Incident Type",
+                        subtitle: widget.engineerIncident.incident_type),
+                    SimpleRow(
                         title: "Incident Description",
                         subtitle: widget.engineerIncident.incident_desc),
 

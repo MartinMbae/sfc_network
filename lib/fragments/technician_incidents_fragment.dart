@@ -90,7 +90,7 @@ class _TechnicianIncidentsPageState extends State<TechnicianIncidentsPage> {
     }
 
     // List<dynamic> incidents = json.decode(response.body);
-
+print(url);
     return response.body;
   }
 }

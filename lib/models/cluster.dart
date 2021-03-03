@@ -18,7 +18,7 @@ class Cluster {
   static Cluster fromJson(dynamic json) {
     return Cluster(
         id: json['id'],
-        region_id: json['region_id'],
+        region_id: json['region_name'],
         cluster_name: json['cluster_name'],
         created_on: json['created_on'],
         created_by: json['created_by'],

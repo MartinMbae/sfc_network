@@ -21,26 +21,39 @@ class _ClustersPageState extends State<ClustersPage> {
       future: fetchClusters(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List<dynamic> clusters = snapshot.data;
-          bool hasData = clusters.length > 0;
-          return ListView.builder(
-              itemCount: clusters.length,
-              itemBuilder: (context, index) {
-                return hasData
-                    ? Column(
-                        children: [
-                          ClusterHolder(
-                            cluster: Cluster.fromJson(clusters[index]),
-                            num: index + 1,
-                          ),
-                          Divider(
-                            color: Colors.black,
-                          )
-                        ],
-                      )
-                    : EmptyPage(
+          String response = snapshot.data;
+          final decoded = jsonDecode(response) as Map;
+          if (decoded.containsKey("success")) {
+            var success = decoded['success'];
+            if (!success) {
+              return EmptyPage(
+                  icon: Icons.error, message: decoded['message']);
+            } else {
+              List<dynamic> clusters =decoded['data'];
+              bool hasData = clusters.length > 0;
+              return ListView.builder(
+                  itemCount: clusters.length,
+                  itemBuilder: (context, index) {
+                    return hasData
+                        ? Column(
+                      children: [
+                        ClusterHolder(
+                          cluster: Cluster.fromJson(clusters[index]),
+                          num: index + 1,
+                        ),
+                        Divider(
+                          color: Colors.black,
+                        )
+                      ],
+                    )
+                        : EmptyPage(
                         icon: Icons.error, message: "No cluster found");
-              });
+                  });
+            }
+          }else{
+            return Container();
+          }
+
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -48,11 +61,11 @@ class _ClustersPageState extends State<ClustersPage> {
     );
   }
 
-  Future<List<dynamic>> fetchClusters() async {
+  Future<String> fetchClusters() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
-    var url = "${BASE_URL}index.php/v1/api/clustersroutes";
+    var url = "${BASE_URL}index.php/v1/api/clusters";
     Map<String, String> queryParams = {
       'id': "$userId",
     };
@@ -72,8 +85,6 @@ class _ClustersPageState extends State<ClustersPage> {
       throw new Exception('Error fetching clusters');
     }
 
-    List<dynamic> clusters = json.decode(response.body);
-
-    return clusters;
+    return response.body;
   }
 }
