@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:ars_progress_dialog/ars_progress_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_network/Widget/simple_row.dart';
 import 'package:flutter_network/map_incident_page.dart';
+import 'package:flutter_network/mark_as_resolved_page.dart';
 import 'package:flutter_network/models/engineer_incident.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class TechnicianAssignedIncidentHolder extends StatefulWidget {
   final EngineerIncident engineerIncident;
@@ -24,27 +24,9 @@ class TechnicianAssignedIncidentHolder extends StatefulWidget {
 
 class _TechnicianAssignedIncidentHolderState extends State<TechnicianAssignedIncidentHolder> {
 
-  File _image;
-
-
-  final picker = ImagePicker();
-
-  Future getImage() async {
-    final pickedFile =
-    await picker.getImage(source: ImageSource.camera, imageQuality: 50);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
 
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
 
-  TextEditingController descController = new TextEditingController();
   ArsProgressDialog progressDialog;
 
   @override
@@ -208,98 +190,12 @@ class _TechnicianAssignedIncidentHolderState extends State<TechnicianAssignedInc
   }
 
   void _settingModalBottomSheet(context){
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc){
-          return Container(
-            child: new Wrap(
-              children: <Widget>[
-                TextFormField(
-                  controller: descController,
-                  maxLength: 200,
-                  maxLines: 5,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      print ("Error");
-                      return "* Required";
-                    } else
-                      return null;
-                  },
-                  textAlign: TextAlign.start,
-                  decoration: InputDecoration(
-                    labelText: 'Add a brief comment on the incident',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        width: 0,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                _image == null
-                    ?  GestureDetector(
-                  child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.add_a_photo),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text('Tap here to attach an image')
-                    ],
-                  ),
-                  onTap: getImage,
-                )
-                    :
-                Column(
-                  children: [
-                    Card(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: Image.file(_image),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 5,
-                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                    ),
-                    GestureDetector(
-                      child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit),
-                          SizedBox(width: 10,),
-                          Text("Edit Image"),
-                        ],
-                      ),
-                      onTap:getImage,
-                    )
-                  ],
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: MaterialButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text(
-                      "Submit",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => MarkAsResolved(
+        incidentId:  widget.engineerIncident.incident_id,
+        assignmentId:  widget.engineerIncident.assignment_id,
+      ),
     );
   }
 }

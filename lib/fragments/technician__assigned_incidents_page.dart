@@ -28,7 +28,18 @@ class _TechnicianAssignedIncidentsPageState
         future: fetchIncidents(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<dynamic> incidents = snapshot.data;
+
+            String response = snapshot.data;
+            try {
+              final decoded = jsonDecode(response) as Map;
+              if (decoded.containsKey("success")) {
+                String message = decoded['message'];
+                return EmptyPage(icon: Icons.error, message: message);
+              }
+            } catch (e) {}
+
+            List<dynamic> incidents = json.decode(response);
+
             bool hasData = incidents.length > 0;
             return ListView.builder(
                 itemCount: incidents.length,
@@ -58,7 +69,7 @@ class _TechnicianAssignedIncidentsPageState
     );
   }
 
-  Future<List<dynamic>> fetchIncidents() async {
+  Future<String> fetchIncidents() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
@@ -79,10 +90,6 @@ class _TechnicianAssignedIncidentsPageState
     if (response.statusCode != 200) {
       throw new Exception('Error fetching incidents');
     }
-
-    print(response.body);
-    List<dynamic> incidents = json.decode(response.body);
-
-    return incidents;
+    return response.body;
   }
 }

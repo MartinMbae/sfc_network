@@ -46,6 +46,7 @@ dependencies:
   prompt_dialog: ^0.1.4
   cupertino_stepper: any
   flutter_launcher_icons: ^0.8.1
+  modal_bottom_sheet: ^1.0.0+1
 
 
 

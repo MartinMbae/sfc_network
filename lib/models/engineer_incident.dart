@@ -8,6 +8,7 @@ class EngineerIncident {
       incident_desc,
       reported_on,
       incident_image,
+      assignment_id,
       status,
       latitude,
       longitude,
@@ -21,6 +22,7 @@ class EngineerIncident {
       this.crq_no,
       this.manhole_name,
       this.incident_desc,
+      this.assignment_id,
       this.reported_on,
       this.status,
       this.incident_image,
@@ -43,6 +45,7 @@ class EngineerIncident {
       longitude: json['longitude'],
       latitude: json['latitude'],
       created_at: json['created_at'],
+      assignment_id: json['assignment_id'],
     );
   }
 }

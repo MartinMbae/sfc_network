@@ -39,7 +39,9 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
   Widget build(BuildContext context) {
     String heroTag = "imageHero${widget.engineerIncident.incident_id}";
 
-    Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery
+        .of(context)
+        .size;
     progressDialog = ArsProgressDialog(context,
         blur: 2,
         backgroundColor: Color(0x33000000),
@@ -121,16 +123,28 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
                           ? Colors.black
                           : Colors.red,
                     ),
-                    widget.engineerIncident.status == "Reported"
-                        ? RaisedButton(
+                    if (widget.engineerIncident.status ==
+                        "Reported") RaisedButton(
                       color: Colors.green[600],
                       onPressed: () => cardKey.currentState.toggleCard(),
                       child: Text(
                         'Action',
                         style: TextStyle(color: Colors.white),
                       ),
+                    ),
+
+                    if (widget.engineerIncident.status ==
+                        "Resolved") RaisedButton(
+                      color: Colors.red[600],
+                      onPressed: () => cardKey.currentState.toggleCard(),
+                      child: Text(
+                        'Check if properly resolved',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     )
-                        : Text(""),
+
+
+
                   ],
                 ),
               ),
@@ -141,7 +155,171 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
           ),
         ),
       ),
-      back: Center(
+      back: widget.engineerIncident.status ==
+          "Resolved" ? Center(
+        child: Container(
+          height: 140,
+          color: Colors.black,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Check resolved status',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RaisedButton(
+                    color: Colors.red[600],
+                    onPressed: () async {
+                      cardKey.currentState.toggleCard();
+                      var reason = await prompt(
+                        context,
+                        title: Text(
+                            'Are you sure you would like this incident to be resolved again.'),
+                        textOK: Text('Yes'),
+                        textCancel: Text('No'),
+                        hintText: 'Please write reason',
+                        minLines: 1,
+                        maxLines: 3,
+                      );
+                      if (reason == null) {
+                        return;
+                      }
+                      progressDialog.show();
+                      SessionManager prefs = new SessionManager();
+                      String userId = await prefs.getId();
+                      var url =
+                          "${BASE_URL}v1/api/incidentApprovalStatus/${widget
+                          .engineerIncident.incident_id}";
+                      http.Response response = await http.put(url, body: {
+                        'engineer_id': "$userId",
+                        'status': "Pending",
+                        'comment': reason,
+                      }).timeout(Duration(seconds: 30), onTimeout: () {
+                        progressDialog.dismiss();
+                        DangerAlertBox(
+                            context: context,
+                            messageText:
+                            "Action took so long. Please check your internet connection and try again.",
+                            title: "Error");
+                        return null;
+                      });
+                      progressDialog.dismiss();
+                      if (response == null) {
+                        DangerAlertBox(
+                            context: context,
+                            messageText:
+                            "Unknown error occurred. Please check your internet connection and try again.",
+                            title: "Error");
+                      } else {
+                        final decoded = jsonDecode(response.body) as Map;
+                        if (decoded.containsKey("success")) {
+                          var status = decoded['success'];
+                          if (!status) {
+                            DangerAlertBox(
+                                context: context,
+                                messageText: decoded['message'],
+                                title: "Failed");
+                            return;
+                          } else {
+                            SuccessAlertBox(
+                                context: context,
+                                messageText:
+                                "Incident has been marked as Pending. It will be re-assigned another technician again.  Changes will be visible after the next refresh",
+                                title: "Success");
+                          }
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Not resolved.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  RaisedButton(
+                    color: Colors.green[600],
+                    onPressed: () async {
+                      cardKey.currentState.toggleCard();
+                      var comment = await prompt(
+                        context,
+                        title: Text(
+                            'Please provide a brief comment'),
+                        textOK: Text('Yes'),
+                        textCancel: Text('No'),
+                        hintText: 'A brief comment on how the incident was resolved',
+                        minLines: 1,
+                        maxLines: 3,
+                      );
+                      if (comment == null) {
+                        return;
+                      }
+                      progressDialog.show();
+                      SessionManager prefs = new SessionManager();
+                      String userId = await prefs.getId();
+                      var url =
+                          "${BASE_URL}v1/api/incidentApprovalStatus/${widget
+                          .engineerIncident.incident_id}";
+                      http.Response response = await http.put(url, body: {
+                        'engineer_id': "$userId",
+                        'status': "Closed",
+                        'comment': comment,
+                      }).timeout(Duration(seconds: 30), onTimeout: () {
+                        progressDialog.dismiss();
+                        DangerAlertBox(
+                            context: context,
+                            messageText:
+                            "Action took so long. Please check your internet connection and try again.",
+                            title: "Error");
+                        return null;
+                      });
+                      progressDialog.dismiss();
+                      if (response == null) {
+                        DangerAlertBox(
+                            context: context,
+                            messageText:
+                            "Unknown error occurred. Please check your internet connection and try again.",
+                            title: "Error");
+                      } else {
+                        final decoded = jsonDecode(response.body) as Map;
+                        if (decoded.containsKey("success")) {
+                          var status = decoded['success'];
+                          if (!status) {
+                            DangerAlertBox(
+                                context: context,
+                                messageText: decoded['message'],
+                                title: "Failed");
+                            return;
+                          } else {
+                            SuccessAlertBox(
+                                context: context,
+                                messageText:
+                                "Incident has been closed. Changes will be visible after the next refresh.",
+                                title: "Success");
+                          }
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Resolved properly',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ) :
+      Center(
         child: Container(
           height: 140,
           color: Colors.black,
@@ -176,14 +354,15 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
                         minLines: 1,
                         maxLines: 3,
                       );
-                      if (reason == null){
+                      if (reason == null) {
                         return;
                       }
                       progressDialog.show();
                       SessionManager prefs = new SessionManager();
                       String userId = await prefs.getId();
                       var url =
-                          "${BASE_URL}v1/api/incidentAction/${widget.engineerIncident.incident_id}";
+                          "${BASE_URL}v1/api/incidentAction/${widget
+                          .engineerIncident.incident_id}";
                       http.Response response = await http.put(url, body: {
                         'engineer_id': "$userId",
                         'status': "Rejected",
@@ -231,7 +410,7 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
                   ),
                   RaisedButton(
                     color: Colors.green[600],
-                    onPressed: () async{
+                    onPressed: () async {
                       cardKey.currentState.toggleCard();
                       var crq = await prompt(
                         context,
@@ -243,14 +422,15 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
                         minLines: 1,
                         maxLines: 1,
                       );
-                      if (crq == null){
+                      if (crq == null) {
                         return;
                       }
                       progressDialog.show();
                       SessionManager prefs = new SessionManager();
                       String userId = await prefs.getId();
                       var url =
-                          "${BASE_URL}v1/api/incidentAction/${widget.engineerIncident.incident_id}";
+                          "${BASE_URL}v1/api/incidentAction/${widget
+                          .engineerIncident.incident_id}";
                       http.Response response = await http.put(url, body: {
                         'engineer_id': "$userId",
                         'status': "Pending",
@@ -301,7 +481,7 @@ class _EngineerIncidentHolderState extends State<EngineerIncidentHolder> {
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }
@@ -317,8 +497,14 @@ class SingleImageScreen extends StatelessWidget {
     return Scaffold(
       body: GestureDetector(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           child: Hero(
             tag: tag,
             child: CachedNetworkImage(

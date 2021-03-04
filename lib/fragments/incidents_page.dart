@@ -61,8 +61,13 @@ class Incidents extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.assignment, color: Colors.green,),
             title: Text("View My Assigned Incidents"),
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> TechnicianAssignedIncidentsPage()));
+            onTap: () async{
+              bool hasPermission =  await checkPermissions();
+              if (hasPermission){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> TechnicianAssignedIncidentsPage()));
+              }else{
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text("Give location permissions"),));
+              }
             },
           ),
           Divider(
