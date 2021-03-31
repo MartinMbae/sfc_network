@@ -9,7 +9,9 @@ import 'package:flutter_network/fragments/manhole_fragment.dart';
 import 'package:flutter_network/fragments/map_fragment.dart';
 import 'package:flutter_network/fragments/patrol_fragment.dart';
 import 'package:flutter_network/fragments/profile_page.dart';
+import 'package:flutter_network/fragments/projects_page.dart';
 import 'package:flutter_network/fragments/report_incident.dart';
+import 'package:flutter_network/fragments/sites_fragment.dart';
 import 'package:flutter_network/fragments/technician_patrol_selection.dart';
 import 'package:flutter_network/fragments/update_password.dart';
 import 'package:flutter_network/models/user.dart';
@@ -30,42 +32,9 @@ class DrawerItem {
 }
 
 class HomePage extends StatefulWidget {
-  final drawerItems = [
-    DrawerItem(
-        title: "Dashboard",
-        icon: Icons.dashboard,
-        fragmentMenu: FragmentMenu.DASHBOARD),
-    DrawerItem(
-        title: "Map", icon: Icons.map, fragmentMenu: FragmentMenu.MAP_FRAGMENT),
-    DrawerItem(
-        title: "Incidents",
-        icon: Icons.dangerous,
-        fragmentMenu: FragmentMenu.INCIDENTS),
-    DrawerItem(
-        title: "Profile",
-        icon: Icons.person,
-        fragmentMenu: FragmentMenu.VIEW_PROFILE),
-    DrawerItem(
-        title: "Clusters",
-        icon: Icons.group_work,
-        fragmentMenu: FragmentMenu.CLUSTERS),
-    DrawerItem(
-        title: "Patrolling",
-        icon: Icons.select_all_rounded,
-        fragmentMenu: FragmentMenu.PATROL),
-    DrawerItem(
-        title: "Junctions",
-        icon: Icons.link,
-        fragmentMenu: FragmentMenu.JUNCTIONS),
-    DrawerItem(
-        title: "Manholes",
-        icon: Icons.local_post_office_outlined,
-        fragmentMenu: FragmentMenu.MANHOLE),
-    DrawerItem(
-        title: "Log out",
-        icon: Icons.logout,
-        fragmentMenu: FragmentMenu.LOGOUT),
-  ];
+  final bool isEngineer;
+
+  HomePage({Key key, @required this.isEngineer}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -79,8 +48,7 @@ class HomePageState extends State<HomePage> {
   User loggedInUser;
   BuildContext mainContext;
 
-
-  _getDrawerItemWidget(FragmentMenu fragmentMenu, bool isEngineer){
+  _getDrawerItemWidget(FragmentMenu fragmentMenu, bool isEngineer) {
     switch (fragmentMenu) {
       case FragmentMenu.DASHBOARD:
         return FirstFragment();
@@ -91,9 +59,9 @@ class HomePageState extends State<HomePage> {
           loggedInUser: loggedInUser,
         );
       case FragmentMenu.INCIDENTS:
-        if (isEngineer){
+        if (isEngineer) {
           return EngineerIncidentsPage();
-        }else{
+        } else {
           return Incidents();
         }
         break;
@@ -113,22 +81,119 @@ class HomePageState extends State<HomePage> {
       case FragmentMenu.MANHOLE:
         return ManholePage();
         break;
+      case FragmentMenu.SITES:
+        return SitesPage();
+        break;
       case FragmentMenu.PATROL:
-        if (isEngineer){
+        if (isEngineer) {
           return EngineerPatrolPage();
-        }else{
+        } else {
           return TechnicianPatrolSelection();
         }
+        break;
+      case FragmentMenu.PROJECTS:
+        return ProjectSelection();
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final drawerItems = widget.isEngineer ? [
+      DrawerItem(
+          title: "Dashboard",
+          icon: Icons.dashboard,
+          fragmentMenu: FragmentMenu.DASHBOARD),
+      DrawerItem(
+          title: "Map",
+          icon: Icons.map,
+          fragmentMenu: FragmentMenu.MAP_FRAGMENT),
+      DrawerItem(
+          title: "Projects",
+          icon: Icons.build_outlined,
+          fragmentMenu: FragmentMenu.PROJECTS),
+      DrawerItem(
+          title: "Incidents",
+          icon: Icons.dangerous,
+          fragmentMenu: FragmentMenu.INCIDENTS),
+      DrawerItem(
+          title: "Profile",
+          icon: Icons.person,
+          fragmentMenu: FragmentMenu.VIEW_PROFILE),
+      DrawerItem(
+          title: "Clusters",
+          icon: Icons.group_work,
+          fragmentMenu: FragmentMenu.CLUSTERS),
+      DrawerItem(
+          title: "Patrolling",
+          icon: Icons.select_all_rounded,
+          fragmentMenu: FragmentMenu.PATROL),
+      DrawerItem(
+          title: "Junctions",
+          icon: Icons.link,
+          fragmentMenu: FragmentMenu.JUNCTIONS),
+      DrawerItem(
+          title: "Manholes",
+          icon: Icons.local_post_office_outlined,
+          fragmentMenu: FragmentMenu.MANHOLE),
+      DrawerItem(
+          title: "Sites",
+          icon: Icons.settings_input_composite,
+          fragmentMenu: FragmentMenu.SITES),
+      DrawerItem(
+          title: "Log out",
+          icon: Icons.logout,
+          fragmentMenu: FragmentMenu.LOGOUT),
+    ]
+    :
+    [
+      DrawerItem(
+          title: "Dashboard",
+          icon: Icons.dashboard,
+          fragmentMenu: FragmentMenu.DASHBOARD),
+      DrawerItem(
+          title: "Map",
+          icon: Icons.map,
+          fragmentMenu: FragmentMenu.MAP_FRAGMENT),
+      DrawerItem(
+          title: "Incidents",
+          icon: Icons.dangerous,
+          fragmentMenu: FragmentMenu.INCIDENTS),
+      DrawerItem(
+          title: "Profile",
+          icon: Icons.person,
+          fragmentMenu: FragmentMenu.VIEW_PROFILE),
+      DrawerItem(
+          title: "Clusters",
+          icon: Icons.group_work,
+          fragmentMenu: FragmentMenu.CLUSTERS),
+      DrawerItem(
+          title: "Patrolling",
+          icon: Icons.select_all_rounded,
+          fragmentMenu: FragmentMenu.PATROL),
+      DrawerItem(
+          title: "Junctions",
+          icon: Icons.link,
+          fragmentMenu: FragmentMenu.JUNCTIONS),
+      DrawerItem(
+          title: "Manholes",
+          icon: Icons.local_post_office_outlined,
+          fragmentMenu: FragmentMenu.MANHOLE),
+      DrawerItem(
+          title: "Sites",
+          icon: Icons.settings_input_composite,
+          fragmentMenu: FragmentMenu.SITES),
+      DrawerItem(
+          title: "Log out",
+          icon: Icons.logout,
+          fragmentMenu: FragmentMenu.LOGOUT),
+    ]
+    ;
+
     mainContext = context;
     List<Widget> drawerOptions = [];
-    for (var i = 0; i < widget.drawerItems.length; i++) {
-      var d = widget.drawerItems[i];
+    for (var i = 0; i < drawerItems.length; i++) {
+      var d = drawerItems[i];
       drawerOptions.add(Column(
         children: [
           ListTile(
@@ -195,7 +260,7 @@ class HomePageState extends State<HomePage> {
       child: Scaffold(
         primary: true,
         appBar: AppBar(
-          title: Text(widget.drawerItems[selectedDrawerIndex].title),
+          title: Text(drawerItems[selectedDrawerIndex].title),
           leading: IconButton(
               icon: Icon(Icons.dehaze),
               onPressed: () {
@@ -207,62 +272,59 @@ class HomePageState extends State<HomePage> {
               }),
         ),
         body: Scaffold(
-          key: _scaffoldKey,
-          drawer: Container(
-            width: 240.w,
-            child: Drawer(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    FutureBuilder(
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          User loggedInUser = snapshot.data;
-                          return UserAccountsDrawerHeader(
-                            accountName: Text(
-                                "${loggedInUser.firstName} ${loggedInUser.lastName}"),
-                            accountEmail: Text("${loggedInUser.email}"),
-                            currentAccountPicture:
-                                Image.asset('assets/net1.png'),
-                          );
-                        } else if (snapshot.hasError) {
-                          return UserAccountsDrawerHeader(
-                            accountName: Text("Error fetching..."),
-                            accountEmail: Text("Error fetching"),
-                            currentAccountPicture:
-                                Image.asset('assets/net1.png'),
-                          );
-                        } else {
-                          return UserAccountsDrawerHeader(
-                            accountName: CircularProgressIndicator(),
-                            accountEmail: CircularProgressIndicator(),
-                            currentAccountPicture:
-                                Image.asset('assets/net1.png'),
-                          );
-                        }
-                      },
-                      future: getUserDetails(),
-                    ),
-                    Column(children: drawerOptions)
-                  ],
+            key: _scaffoldKey,
+            drawer: Container(
+              width: 240.w,
+              child: Drawer(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      FutureBuilder(
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            User loggedInUser = snapshot.data;
+                            return UserAccountsDrawerHeader(
+                              accountName: Text(
+                                  "${loggedInUser.firstName} ${loggedInUser.lastName}"),
+                              accountEmail: Text("${loggedInUser.email}"),
+                              currentAccountPicture:
+                                  Image.asset('assets/net1.png'),
+                            );
+                          } else if (snapshot.hasError) {
+                            return UserAccountsDrawerHeader(
+                              accountName: Text("Error fetching..."),
+                              accountEmail: Text("Error fetching"),
+                              currentAccountPicture:
+                                  Image.asset('assets/net1.png'),
+                            );
+                          } else {
+                            return UserAccountsDrawerHeader(
+                              accountName: CircularProgressIndicator(),
+                              accountEmail: CircularProgressIndicator(),
+                              currentAccountPicture:
+                                  Image.asset('assets/net1.png'),
+                            );
+                          }
+                        },
+                        future: getUserDetails(),
+                      ),
+                      Column(children: drawerOptions)
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          body:  FutureBuilder(
-            future: getUserDetails(),
-    builder: (context, snapshot){
-
-    if (snapshot.hasData) {
-      User loggedInUser = snapshot.data;
-      return  _getDrawerItemWidget(selectedDrawer, loggedInUser.role == "2");
-    }else{
-      return Container();
-    }
-    }
-
-          )
-        ),
+            body: FutureBuilder(
+                future: getUserDetails(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    User loggedInUser = snapshot.data;
+                    return _getDrawerItemWidget(
+                        selectedDrawer, loggedInUser.role == "2");
+                  } else {
+                    return Container();
+                  }
+                })),
       ),
     );
   }

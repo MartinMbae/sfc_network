@@ -38,7 +38,6 @@ class _ManholeClusterPageState extends State<ManholeClusterPage> {
                 return EmptyPage(icon: Icons.error, message: message);
               }
             } catch (e) {
-              print("Errror ${e.toString()}");
             }
 
             List<dynamic> manhole = json.decode(response);
@@ -75,7 +74,6 @@ class _ManholeClusterPageState extends State<ManholeClusterPage> {
     var userId = await prefs.getId();
     var url = "${BASE_URL}index.php/v1/api/clustersroutes/$clusterId";
 
-    print(url);
     Map<String, String> queryParams = {
       'id': "$userId",
     };

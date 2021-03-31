@@ -37,8 +37,6 @@ class _ReportIncidentState extends State<ReportIncident> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
       }
     });
   }
@@ -103,8 +101,6 @@ class _ReportIncidentState extends State<ReportIncident> {
                 context: context, messageText: message, title: "Error");
           }
         }
-
-        print(value);
       });
     } else {
       DangerAlertBox(
@@ -379,8 +375,6 @@ class _ReportIncidentState extends State<ReportIncident> {
                                     var id = await prefs.getId();
                                     submitIncidence(id,
                                         descController.text, _image, context);
-                                  } else {
-                                    print("validation failed");
                                   }
                                 },
                               ),

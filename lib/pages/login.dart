@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushAndRemoveUntil<dynamic>(
             context,
             MaterialPageRoute<dynamic>(
-              builder: (BuildContext context) => HomePage(),
+              builder: (BuildContext context) => HomePage(isEngineer: role == "2",),
             ),
             (route) => false, //if you want to disable back feature set to false
           );

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_network/Widget/simple_row.dart';
-import 'package:flutter_network/models/cluster.dart';
-import 'package:flutter_network/models/manhole.dart';
+import 'package:flutter_network/models/project.dart';
 
-class ManholeHolder extends StatelessWidget {
+class ProjectHolder extends StatelessWidget {
 
-  final Manhole manhole;
+  final Project project;
   final int num;
 
-  const ManholeHolder({Key key,  @required this.manhole, @required this.num}) : super(key: key);
+  const ProjectHolder({Key key,  @required this.project, @required this.num}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,19 +43,10 @@ class ManholeHolder extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(text: manhole.manholename, style:TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
-                      ],
-                    ),
-                  ),
-
-                  SimpleRow(title: "Location Level", subtitle:manhole.locationlevel),
-                  SimpleRow(title: "Location System", subtitle:manhole.locationsystem),
-                  SimpleRow(title: "Latitude", subtitle:manhole.latitude),
-                  SimpleRow(title: "Longitude", subtitle:manhole.longitude),
-                  SimpleRow(title: "Status", subtitle:manhole.status, subtitleColor: Colors.green[600], ),
+                  SimpleRow(title: "Site Type", subtitle:project.site_type),
+                  SimpleRow(title: "Site Name", subtitle:project.site_name),
+                  SimpleRow(title: "Description", subtitle:project.description),
+                  SimpleRow(title: "Created By", subtitle:project.tech_name),
                 ],
               ),
             ),

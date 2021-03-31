@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_network/Widget/simple_row.dart';
-import 'package:flutter_network/models/junction.dart';
+import 'package:flutter_network/fragments/manhole_cluster_page.dart';
+import 'package:flutter_network/models/cluster.dart';
 
-class JunctionHolder extends StatelessWidget {
+import 'models/site.dart';
 
-  final Junction junction;
+class SiteHolder extends StatelessWidget {
+
+  final Site site;
   final int num;
 
-  const JunctionHolder({Key key,  @required this.junction, @required this.num}) : super(key: key);
+  const SiteHolder({Key key,  @required this.site, @required this.num}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: 260,
+      height: 300,
       width: size.width,
       color: Colors.white,
       padding: EdgeInsets.only(left: 10),
@@ -24,7 +27,7 @@ class JunctionHolder extends StatelessWidget {
         child: Row(
           children: [
             Container(
-                margin: EdgeInsets.symmetric(vertical: 20),
+                margin: EdgeInsets.symmetric(vertical: 10),
                 decoration: new BoxDecoration(
                   color: Colors.green[700],
                   borderRadius: BorderRadius.circular(10),
@@ -46,24 +49,22 @@ class JunctionHolder extends StatelessWidget {
                   RichText(
                     text: TextSpan(
                       children: <TextSpan>[
-                        TextSpan(text: junction.component_name, style:TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                        TextSpan(text: site.name, style:TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
                       ],
                     ),
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  SimpleRow(title: "Location Level", subtitle:site.locationlevel),
+                  SimpleRow(title: "Location System", subtitle:site.locationsystem),
+                  SimpleRow(title: "Latitude", subtitle:site.latitude),
+                  SimpleRow(title: "Longitude", subtitle:site.longitude),
+                  SimpleRow(title: "Status", subtitle:site.status),
+                  SimpleRow(title: "Status Date", subtitle:site.status_date),
+                  SimpleRow(title: "Location Type", subtitle:site.locationtype),
+                  SimpleRow(title: "Description", subtitle:site.description),
 
-                  SimpleRow(title: "Type", subtitle:junction.comp_type),
-                  SimpleRow(title: "Category", subtitle: junction.category),
-                  SimpleRow(title: "Sub Category", subtitle: junction.subcategory),
-                  SimpleRow(title: "Owner", subtitle: junction.owner),
-                  SimpleRow(title: "Cluster", subtitle: junction.cluster_id),
-                  SimpleRow(title: "Technique", subtitle: junction.technique),
-                  SimpleRow(title: "aLocation", subtitle: junction.alocation),
-                  SimpleRow(title: "aLocation Description", subtitle: junction.alocationdesc),
-                  SimpleRow(title: "zLocation", subtitle: junction.zlocation),
-                  SimpleRow(title: "zLocation Description", subtitle: junction.zlocationdesc),
-                  SimpleRow(title: "Effective Length", subtitle: junction.effectivelength),
-                  SimpleRow(title: "Location Type", subtitle: junction.location_type),
-                  SimpleRow(title: "Status", subtitle: junction.status, subtitleColor: Colors.green[600],),
                 ],
               ),
             ),

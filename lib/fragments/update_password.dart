@@ -136,7 +136,6 @@ class UpdatePassword extends StatelessWidget {
                           String newPass = newPassController.text;
                           String confirmPass = confirmPassController.text;
                           String oldPass = oldPassController.text;
-                          print("Confirm Pas is $confirmPass");
                           if (newPass != confirmPass) {
                             Scaffold.of(mainContext).showSnackBar(SnackBar(
                                 content:
@@ -167,7 +166,6 @@ class UpdatePassword extends StatelessWidget {
                                       "Unknown error occurred. Please check your internet connection and try again.",
                                   title: "Error");
                             } else {
-                              print(response.body);
                               final decoded = jsonDecode(response.body) as Map;
                               if (decoded.containsKey("success")) {
                                 var status = decoded['success'];

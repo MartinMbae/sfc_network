@@ -87,9 +87,6 @@ class _TechnicianIncidentsPageState extends State<TechnicianIncidentsPage> {
     if (response.statusCode != 200) {
       throw new Exception('Error fetching incidents');
     }
-
-    // List<dynamic> incidents = json.decode(response.body);
-print(url);
     return response.body;
   }
 }
