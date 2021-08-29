@@ -20,10 +20,10 @@ class _JunctionsPageState extends State<JunctionsPage> {
   List<dynamic> initialJunctions;
   var scrollController = ScrollController();
   bool updating = false;
-  
+
   bool showSearchResults = false;
   var searchTerm = "";
-  
+
 
   @override
   void initState() {
@@ -42,7 +42,8 @@ class _JunctionsPageState extends State<JunctionsPage> {
     });
     var scrollPosition = scrollController.position;
     if (scrollPosition.pixels == scrollPosition.maxScrollExtent) {
-      List<dynamic> newIcsNews = await  JunctionApiHelper().fetchJunctions(context, "${initialJunctions.length}");
+      List<dynamic> newIcsNews = await JunctionApiHelper().fetchJunctions(
+          context, "${initialJunctions.length}");
       initialJunctions.addAll(newIcsNews);
     }
 
@@ -53,15 +54,16 @@ class _JunctionsPageState extends State<JunctionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(showSearchResults){
+    if (showSearchResults) {
       return getSearchJunctionBody();
-    }else {
+    } else {
       return getJunctionsBody();
     }
   }
 
   getJunctionsBody() {
-    if (initialJunctions == null) return Center(child: CircularProgressIndicator());
+    if (initialJunctions == null)
+      return Center(child: CircularProgressIndicator());
     return NotificationListener<ScrollNotification>(
       onNotification: (noti) {
         if (noti is ScrollEndNotification) {
@@ -70,7 +72,10 @@ class _JunctionsPageState extends State<JunctionsPage> {
         return true;
       },
       child: Container(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
         child: Column(
           children: [
             getSearchIcon(false, ""),
@@ -80,7 +85,7 @@ class _JunctionsPageState extends State<JunctionsPage> {
                 shrinkWrap: true,
                 controller: scrollController,
                 itemBuilder: (context, index) {
-                  return  JunctionHolder(
+                  return JunctionHolder(
                     junction: Junction.fromJson(initialJunctions[index]),
                     num: index + 1,
                   );
@@ -94,7 +99,7 @@ class _JunctionsPageState extends State<JunctionsPage> {
     );
   }
 
-  
+
   Future<String> fetchJunctions() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
@@ -108,13 +113,13 @@ class _JunctionsPageState extends State<JunctionsPage> {
     var requestUrl = url + '?' + queryString;
     var response = await http.get(requestUrl).timeout(Duration(seconds: 30),
         onTimeout: () {
-      DangerAlertBox(
-          context: context,
-          messageText:
+          DangerAlertBox(
+              context: context,
+              messageText:
               "Action took so long. Please check your internet connection and try again.",
-          title: "Error");
-      return null;
-    });
+              title: "Error");
+          return null;
+        });
     if (response.statusCode != 200) {
       throw new Exception('Error fetching junctions');
     }
@@ -123,14 +128,13 @@ class _JunctionsPageState extends State<JunctionsPage> {
   }
 
 
-
-  getSearchIcon(bool showInitial, String initial){
-    return  Container(
+  getSearchIcon(bool showInitial, String initial) {
+    return Container(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: OutlineSearchBar(
         initText: showInitial ? initial : "",
         hintText: "Search by junction name",
-        onSearchButtonPressed: (key){
+        onSearchButtonPressed: (key) {
           searchTerm = key;
           setState(() {
             showSearchResults = true;
@@ -140,48 +144,36 @@ class _JunctionsPageState extends State<JunctionsPage> {
     );
   }
 
-   getSearchJunctionBody() {
-    return Column(
+  getSearchJunctionBody() {
+    return ListView(
       children: [
         getSearchIcon(true, searchTerm),
         FutureBuilder(
           future: fetchSearchJunctions(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              String response = snapshot.data;
-              final decoded = jsonDecode(response) as Map;
-              if (decoded.containsKey("success")) {
-                var success = decoded['success'];
-                if (!success) {
-                  return EmptyPage(
-                    height: 200.0,
-                      icon: Icons.error, message: decoded['message']);
-                } else {
-                  List<dynamic> junctions =decoded['data'];
-                  bool hasData = junctions.length > 0;
-                  return ListView.builder(
-                      itemCount: junctions.length,
-                      itemBuilder: (context, index) {
-                        return hasData
-                            ? Column(
-                          children: [
-                            JunctionHolder(
-                              junction: Junction.fromJson(junctions[index]),
-                              num: index + 1,
-                            ),
-                            Divider(
-                              color: Colors.black,
-                            )
-                          ],
+              List<dynamic> junctions = snapshot.data;
+              bool hasData = junctions.length > 0;
+              return ListView.builder(
+                shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: junctions.length,
+                  itemBuilder: (context, index) {
+                    return hasData
+                        ? Column(
+                      children: [
+                        JunctionHolder(
+                          junction: Junction.fromJson(junctions[index]),
+                          num: index + 1,
+                        ),
+                        Divider(
+                          color: Colors.black,
                         )
-                            : EmptyPage(
-                            icon: Icons.error, message: "No junctions found");
-                      });
-                }
-              }else{
-                return Container();
-              }
-
+                      ],
+                    )
+                        : EmptyPage(
+                        icon: Icons.error, message: "No junctions found");
+                  });
             } else {
               return Center(child: CircularProgressIndicator());
             }
@@ -191,7 +183,7 @@ class _JunctionsPageState extends State<JunctionsPage> {
     );
   }
 
-  Future<String> fetchSearchJunctions() async {
+  Future<List<dynamic>> fetchSearchJunctions() async {
     await Future.delayed(Duration(seconds: 2));
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
@@ -216,28 +208,28 @@ class _JunctionsPageState extends State<JunctionsPage> {
       throw new Exception('Error fetching junctions');
     }
 
-    return response.body;
+    List<dynamic> junctions = json.decode(response.body);
+    return junctions;
   }
-  
-}
 
+}
 
 
 class JunctionApiHelper {
 
-  Future<List<dynamic>> fetchJunctions( BuildContext context, String start) async {
-
+  Future<List<dynamic>> fetchJunctions(BuildContext context,
+      String start) async {
     var url = "${BASE_URL}index.php/v1/api/junctions";
     SessionManager prefs = SessionManager();
     var userId = await prefs.getId();
     Map<String, String> queryParams = {
       'id': "$userId",
-      'start':start,
-      'limit':"20"
+      'start': start,
+      'limit': "20"
     };
     String queryString = Uri(queryParameters: queryParams).query;
 
-    var requestUrl = url  + '?' + queryString;
+    var requestUrl = url + '?' + queryString;
     var response = await http.get(requestUrl).timeout(Duration(seconds: 30),
         onTimeout: () {
           DangerAlertBox(

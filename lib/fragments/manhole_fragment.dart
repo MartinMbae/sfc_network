@@ -84,7 +84,6 @@ class _ManholePageState extends State<ManholePage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     if(showSearchResults){
@@ -95,7 +94,7 @@ class _ManholePageState extends State<ManholePage> {
   }
   
   getSearchManholeBody(){
-   return Column(
+   return ListView(
      children: [
        getSearchIcon(true, searchTerm),
        FutureBuilder(
@@ -105,6 +104,8 @@ class _ManholePageState extends State<ManholePage> {
               List<dynamic> manhole = snapshot.data;
               bool hasData = manhole.length > 0;
               return ListView.builder(
+                shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: manhole.length,
                   itemBuilder: (context, index) {
                     return hasData
@@ -153,8 +154,6 @@ class _ManholePageState extends State<ManholePage> {
               title: "Error");
           return null;
         });
-
-
     if (response.statusCode != 200) {
       throw new Exception('Error fetching manholes');
     }
@@ -179,6 +178,7 @@ class _ManholePageState extends State<ManholePage> {
       ),
     );
   }
+
 }
 
 

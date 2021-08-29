@@ -15,8 +15,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:path/path.dart';
 
-
-
 class PatrolPage extends StatefulWidget {
   @override
   _PatrolPageState createState() => _PatrolPageState();
@@ -28,9 +26,10 @@ class _PatrolPageState extends State<PatrolPage> {
   ScrollController c;
 
   String selection, condition;
-  String manhole_id, junction_id;
+  String manhole_name, junction_name;
   TextEditingController descController = new TextEditingController();
-
+  TextEditingController junctionController = new TextEditingController();
+  TextEditingController manholeController = new TextEditingController();
 
   String latitude, longitude;
 
@@ -74,41 +73,6 @@ class _PatrolPageState extends State<PatrolPage> {
     return manhole;
   }
 
-  Future<List<dynamic>> fetchJunctions(BuildContext context) async {
-    await Future.delayed(Duration(seconds: 2));
-    SessionManager prefs = SessionManager();
-    var userId = await prefs.getId();
-    var url = "${BASE_URL}index.php/v1/api/junctions";
-    Map<String, String> queryParams = {
-      'id': "$userId",
-    };
-    String queryString = Uri(queryParameters: queryParams).query;
-
-    var requestUrl = url + '?' + queryString;
-    var response = await http.get(requestUrl).timeout(Duration(seconds: 30),
-        onTimeout: () {
-      DangerAlertBox(
-          context: context,
-          messageText:
-              "Action took so long. Please check your internet connection and try again.",
-          title: "Error");
-      return null;
-    });
-    if (response.statusCode != 200) {
-      throw new Exception('Error fetching junctions');
-    }
-
-    final decoded = jsonDecode(response.body) as Map;
-    if (decoded.containsKey("success")) {
-      var success = decoded['success'];
-
-      if (success) {
-        List<dynamic> junctions = decoded['data'];
-        return junctions;
-      }
-    }
-  }
-
   Future<LocationData> getLocationUpdates() async {
     Location location = new Location();
 
@@ -123,93 +87,100 @@ class _PatrolPageState extends State<PatrolPage> {
     return _locationData;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     c = new PageController();
 
-    return  Scaffold(
-          appBar: AppBar(title: Text("Patrol"),),
-          body: PageView(
-      physics: new NeverScrollableScrollPhysics(),
-      controller: c,
-      // controller: PageController(viewportFraction: 0.8),
-      children: [
-        FutureBuilder(
-          future: getLocationUpdates(),
-          builder: (builder, snapshot) {
-            if (snapshot.hasData) {
-              LocationData locationData = snapshot.data;
-              latitude = "${locationData.latitude}";
-              longitude = "${locationData.longitude}";
-              return Container(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/patrol.png'),
-                    SizedBox(height: 30,),
-                    Text("Report the status of the site elements".toUpperCase(), textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
-                    ),
-
-                    SizedBox(height: 30,),
-                    DropDownFormField(
-                      titleText: 'Select element type',
-                      hintText: 'Please choose one',
-                      value: selection,
-                      onSaved: (value) {
-                        setState(() {
-                          selection = value;
-                        });
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          selection = value;
-                        });
-                      },
-                      dataSource: [
-                        {
-                          "value": "Junction",
-                        },
-                        {
-                          "value": "Manhole",
-                        },
-                      ],
-                      textField: 'value',
-                      valueField: 'value',
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    RaisedButton(
-                      color: Colors.green,
-                      child: Text(
-                        'Proceed',
-                        style: TextStyle(color: Colors.white),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Patrol"),
+      ),
+      body: PageView(
+        physics: new NeverScrollableScrollPhysics(),
+        controller: c,
+        // controller: PageController(viewportFraction: 0.8),
+        children: [
+          FutureBuilder(
+            future: getLocationUpdates(),
+            builder: (builder, snapshot) {
+              if (snapshot.hasData) {
+                LocationData locationData = snapshot.data;
+                latitude = "${locationData.latitude}";
+                longitude = "${locationData.longitude}";
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/patrol.png'),
+                      SizedBox(
+                        height: 30,
                       ),
-                      onPressed: () async {
-                        if (selection == null) {
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text("You have not made any selection")));
-                        } else {
-                          c.animateTo(MediaQuery.of(context).size.width,
-                              duration: new Duration(seconds: 1),
-                              curve: Curves.easeIn);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-
+                      Text(
+                        "Report the status of the site elements".toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      DropDownFormField(
+                        titleText: 'Select element type',
+                        hintText: 'Please choose one',
+                        value: selection,
+                        onSaved: (value) {
+                          setState(() {
+                            selection = value;
+                          });
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            selection = value;
+                          });
+                        },
+                        dataSource: [
+                          {
+                            "value": "Junction",
+                          },
+                          {
+                            "value": "Manhole",
+                          },
+                        ],
+                        textField: 'value',
+                        valueField: 'value',
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      RaisedButton(
+                        color: Colors.green,
+                        child: Text(
+                          'Proceed',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () async {
+                          if (selection == null) {
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                                content:
+                                    Text("You have not made any selection")));
+                          } else {
+                            c.animateTo(MediaQuery.of(context).size.width,
+                                duration: new Duration(seconds: 1),
+                                curve: Curves.easeIn);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
           Container(
             color: Colors.red[200].withOpacity(0.2),
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -220,69 +191,47 @@ class _PatrolPageState extends State<PatrolPage> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   selection == "Manhole"
-                      ? FutureBuilder(
-                          future: fetchManholes(context),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              List<dynamic> manholes = snapshot.data;
-                              return DropDownFormField(
-                                required: true,
-                                titleText: 'Select manhole',
-                                hintText: 'Please choose one',
-                                value: manhole_id,
-                                onSaved: (value) {
-                                  setState(() {
-                                    manhole_id = value;
-                                  });
-                                },
-                                onChanged: (value) {
-                                  setState(() {
-                                    manhole_id = value;
-                                  });
-                                },
-                                dataSource: manholes,
-                                textField: 'manholename',
-                                valueField: 'id',
-                              );
-                            } else {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                          })
+                      ? TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Manhole Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                          width: 0,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "* Required";
+                      } else
+                        return null;
+                    },
+                    controller: manholeController,
+                    //validatePassword,        //Function to check validation
+                  )
                       : selection == "Junction"
-                          ? FutureBuilder(
-                              future: fetchJunctions(context),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  List<dynamic> junctions = snapshot.data;
-                                  return DropDownFormField(
-                                    required: true,
-                                    titleText: 'Select junction',
-                                    hintText: 'Please choose one',
-                                    value: junction_id,
-                                    onSaved: (value) {
-                                      setState(() {
-                                        junction_id = value;
-                                      });
-                                    },
-                                    onChanged: (value) {
-                                      setState(() {
-                                        junction_id = value;
-                                      });
-                                    },
-                                    dataSource: junctions,
-                                    textField: 'component_name',
-                                    valueField: 'id',
-                                  );
-                                } else {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(),
-                                  );
-                                }
-                              })
+                          ? TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'Junction Name',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "* Required";
+                                } else
+                                  return null;
+                              },
+                              controller: junctionController,
+                              //validatePassword,        //Function to check validation
+                            )
                           : Text("Selection is $selection"),
                   SizedBox(
                     height: 20,
@@ -343,7 +292,6 @@ class _PatrolPageState extends State<PatrolPage> {
                   SizedBox(
                     height: 20,
                   ),
-
                   _image == null
                       ? GestureDetector(
                           child: Row(
@@ -358,33 +306,33 @@ class _PatrolPageState extends State<PatrolPage> {
                           ),
                           onTap: getImage,
                         )
-                      :
-                  Column(
-                    children: [
-                      Card(
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        child: Image.file(_image),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        elevation: 5,
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                      ),
-                      GestureDetector(
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
+                      : Column(
                           children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: 10,),
-                            Text("Edit Image"),
+                            Card(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: Image.file(_image),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 5,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 5),
+                            ),
+                            GestureDetector(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.edit),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text("Edit Image"),
+                                ],
+                              ),
+                              onTap: getImage,
+                            )
                           ],
                         ),
-                        onTap:getImage,
-                      )
-                    ],
-                  ),
-
                   SizedBox(
                     height: 20,
                   ),
@@ -417,12 +365,13 @@ class _PatrolPageState extends State<PatrolPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         onPressed: () async {
-                          if (junction_id == null && manhole_id == null) {
+                          if (junctionController.text.isEmpty && manholeController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text("Please select a $selection")));
                           } else if (condition == null) {
                             Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text("Please select $selection's condition")));
+                                content: Text(
+                                    "Please select $selection's condition")));
                           } else if (descController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text(
@@ -433,11 +382,15 @@ class _PatrolPageState extends State<PatrolPage> {
                           } else {
                             SessionManager prefs = SessionManager();
                             var id = await prefs.getId();
-
-                            var siteId =
-                                manhole_id == null ? junction_id : manhole_id;
-                            submitPatrollingMessage(selection, siteId, id,
-                                condition, descController.text, _image, context);
+                            var siteName =  manholeController.text.isEmpty ? junctionController.text : manholeController.text;
+                            submitPatrollingMessage(
+                                selection,
+                                siteName,
+                                id,
+                                condition,
+                                descController.text,
+                                _image,
+                                context);
                           }
                         },
                       ),
@@ -447,16 +400,14 @@ class _PatrolPageState extends State<PatrolPage> {
               ),
             ),
           ),
-      ],
-    ),
-        );
+        ],
+      ),
+    );
   }
-
-
 
   Future<void> submitPatrollingMessage(
       String siteType,
-      String siteId,
+      String siteName,
       String techId,
       String status,
       String desc,
@@ -485,7 +436,7 @@ class _PatrolPageState extends State<PatrolPage> {
     var request = new http.MultipartRequest("POST", uri);
 
     request.fields['tech_id'] = techId;
-    request.fields['site_id'] = siteId;
+    request.fields['site_name'] = siteName;
     request.fields['site_type'] = siteType;
     request.fields['description'] = desc;
     request.fields['status'] = status;
