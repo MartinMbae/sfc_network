@@ -22,10 +22,12 @@ class ReportIncident extends StatefulWidget {
 class _ReportIncidentState extends State<ReportIncident> {
   File _image;
 
-  String manhole_id;
+  String manhole_name;
   String maintenance_type_id;
 
   String latitude, longitude;
+
+  TextEditingController manholeController = new TextEditingController();
 
   TextEditingController descController = new TextEditingController();
 
@@ -41,8 +43,8 @@ class _ReportIncidentState extends State<ReportIncident> {
     });
   }
 
-  Future<void> submitIncidence(String techId, String desc,
-      File imageFile, BuildContext context) async {
+  Future<void> submitIncidence(
+      String techId, String desc, File imageFile, BuildContext context) async {
     if (imageFile == null) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text("Please select an image"),
@@ -66,7 +68,7 @@ class _ReportIncidentState extends State<ReportIncident> {
     var request = new http.MultipartRequest("POST", uri);
 
     request.fields['tech_id'] = techId;
-    request.fields['manhole_id'] = manhole_id;
+    request.fields['manhole_name'] = manholeController.text.trim();
     request.fields['incident_desc'] = desc;
     request.fields['type'] = maintenance_type_id;
     request.fields['longitude'] = longitude;
@@ -180,7 +182,7 @@ class _ReportIncidentState extends State<ReportIncident> {
       appBar: AppBar(
         title: Text("Report Incidents"),
       ),
-      body:  Padding(
+      body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
         child: ListView(
           children: [
@@ -209,39 +211,26 @@ class _ReportIncidentState extends State<ReportIncident> {
                             SizedBox(
                               height: SDP.sdp(30),
                             ),
-                            FutureBuilder(
-                                future: fetchManholes(context),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    List<dynamic> manholes = snapshot.data;
-                                    return Container(
-                                      child: DropDownFormField(
-                                        required: true,
-                                        titleText: 'Select manhole',
-                                        hintText: 'Please choose one',
-                                        value: manhole_id,
-                                        onSaved: (value) {
-                                          setState(() {
-                                            manhole_id = value;
-                                          });
-                                        },
-                                        onChanged: (value) {
-                                          setState(() {
-                                            manhole_id = value;
-                                          });
-                                        },
-                                        dataSource: manholes,
-                                        textField: 'manholename',
-                                        valueField: 'id',
-                                      ),
-                                    );
-                                  } else {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
-                                }),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'Manhole Name',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "* Required";
+                                } else
+                                  return null;
+                              },
+                              controller: manholeController,
+                              //validatePassword,        //Function to check validation
+                            ),
                             SizedBox(
                               height: SDP.sdp(30),
                             ),
@@ -253,7 +242,7 @@ class _ReportIncidentState extends State<ReportIncident> {
                                     return Container(
                                       child: DropDownFormField(
                                         titleText:
-                                        'Select maintenance type required',
+                                            'Select maintenance type required',
                                         hintText: 'Please choose one',
                                         value: maintenance_type_id,
                                         onSaved: (value) {
@@ -287,7 +276,7 @@ class _ReportIncidentState extends State<ReportIncident> {
                               maxLines: 5,
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  print ("Error");
+                                  print("Error");
                                   return "* Required";
                                 } else
                                   return null;
@@ -309,47 +298,50 @@ class _ReportIncidentState extends State<ReportIncident> {
                               height: SDP.sdp(30),
                             ),
                             _image == null
-                                ?  GestureDetector(
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.add_a_photo),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('Tap here to attach an image')
-                                ],
-                              ),
-                              onTap: getImage,
-                            )
-                                :
-                            Column(
-                              children: [
-                                Card(
-                                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  child: Image.file(_image),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 5,
-                                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                                ),
-                                GestureDetector(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                ? GestureDetector(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.add_a_photo),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text('Tap here to attach an image')
+                                      ],
+                                    ),
+                                    onTap: getImage,
+                                  )
+                                : Column(
                                     children: [
-                                      Icon(Icons.edit),
-                                      SizedBox(width: 10,),
-                                      Text("Edit Image"),
+                                      Card(
+                                        clipBehavior:
+                                            Clip.antiAliasWithSaveLayer,
+                                        child: Image.file(_image),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        elevation: 5,
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 5),
+                                      ),
+                                      GestureDetector(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.edit),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Edit Image"),
+                                          ],
+                                        ),
+                                        onTap: getImage,
+                                      )
                                     ],
                                   ),
-                                  onTap:getImage,
-                                )
-                              ],
-                            ),
-
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               child: MaterialButton(
@@ -360,12 +352,12 @@ class _ReportIncidentState extends State<ReportIncident> {
                                 ),
                                 onPressed: () async {
                                   if (_formKey.currentState.validate()) {
-
-
-                                    if (maintenance_type_id == null || manhole_id  == null){
-
-                                      Scaffold.of(context).showSnackBar(SnackBar(
-                                        content: Text("Please Select all the fields"),
+                                    if (maintenance_type_id == null ||
+                                        manholeController.text.isEmpty) {
+                                      Scaffold.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content: Text(
+                                            "Please Select all the fields"),
                                         duration: Duration(seconds: 3),
                                       ));
                                       return;
@@ -373,8 +365,8 @@ class _ReportIncidentState extends State<ReportIncident> {
 
                                     SessionManager prefs = SessionManager();
                                     var id = await prefs.getId();
-                                    submitIncidence(id,
-                                        descController.text, _image, context);
+                                    submitIncidence(id, descController.text,
+                                        _image, context);
                                   }
                                 },
                               ),
